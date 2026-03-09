@@ -148,24 +148,28 @@
 
             <div class="flex-grow overflow-y-auto p-4 sm:p-6 relative">
                 
-                <!-- 1. DASHBOARD -->
+                <!-- 1. DASHBOARD (Agora com a coluna da Frota restaurada!) -->
                 <div id="view-dashboard" class="view-content">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-blue-600 hover:shadow-md transition">
-                            <p class="text-xs text-slate-500 font-bold uppercase">Entregas Pendentes</p>
-                            <h3 class="text-2xl font-black text-slate-800" id="dash-cargas">0</h3>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Entregas Pendentes</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1" id="dash-cargas">0</h3>
                         </div>
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-green-600 hover:shadow-md transition">
-                            <p class="text-xs text-slate-500 font-bold uppercase">Sinal Satélite Ativo</p>
-                            <h3 class="text-2xl font-black text-slate-800" id="dash-gps-ativos">0</h3>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Satélite Ativo</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1" id="dash-gps-ativos">0</h3>
                         </div>
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-orange-500 hover:shadow-md transition">
-                            <p class="text-xs text-slate-500 font-bold uppercase">Ocorrências da Estrada</p>
-                            <h3 class="text-2xl font-black text-slate-800" id="dash-ocorrencias">0</h3>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Ocorrências</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1" id="dash-ocorrencias">0</h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-purple-600 hover:shadow-md transition">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Lojas na Base</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1" id="dash-clientes">0</h3>
                         </div>
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-slate-800 hover:shadow-md transition">
-                            <p class="text-xs text-slate-500 font-bold uppercase">Lojas na Base</p>
-                            <h3 class="text-2xl font-black text-slate-800" id="dash-clientes">0</h3>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Veículos (Frota)</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-1" id="dash-frota">0</h3>
                         </div>
                     </div>
                     <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center py-12 relative overflow-hidden bg-gradient-to-br from-white to-slate-50">
@@ -255,6 +259,7 @@
                             </div>
                             <div class="bg-slate-200 p-1 rounded-xl border flex-grow relative min-h-[300px]">
                                 <div id="map-rota" class="w-full h-full rounded-lg shadow-inner"></div>
+                                <!-- Restauração do Overlay da Rota -->
                                 <div id="map-rota-overlay" class="absolute inset-0 bg-slate-100/90 z-20 flex flex-col items-center justify-center rounded-lg text-center p-4">
                                     <i class='bx bx-radar text-5xl text-slate-400 mb-2'></i>
                                     <p class="text-slate-600 font-bold">Aguardando Ativação do Radar</p>
@@ -329,6 +334,7 @@
                             <i class='bx bx-plus'></i> Registrar Viatura
                         </button>
                     </div>
+                    <!-- AQUI A DIV QUE FOI APAGADA POR ENGANO NA MINIFICAÇÃO E AGORA FOI RESTAURADA! -->
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="lista-frota"></div>
                 </div>
 
@@ -669,8 +675,13 @@
         const db = firebase.database();
         const auth = firebase.auth();
         
-        // CORREÇÃO CRÍTICA: Prevenção de "Script error" por inicialização duplicada no ambiente
-        const secondaryApp = firebase.apps.find(app => app.name === "SecondaryApp") || firebase.initializeApp(firebaseConfig, "SecondaryApp");
+        // CORREÇÃO CRÍTICA 1: Prevenção de "Script error" por inicialização duplicada no ambiente
+        let secondaryApp;
+        try {
+            secondaryApp = firebase.app("SecondaryApp");
+        } catch (e) {
+            secondaryApp = firebase.initializeApp(firebaseConfig, "SecondaryApp");
+        }
         const secondaryAuth = secondaryApp.auth();
 
         // O NÓ CENTRAL DA SUA EMPRESA (Conforme o JSON enviado)
@@ -734,32 +745,32 @@
 
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                if (currentUser && currentUser.uid === user.uid) return; // Evita loop na tela caso já esteja logado
+                if (currentUser && currentUser.uid === user.uid) return; // Evita loop
                 validarEEntrar(user); 
             }
         });
 
+        // CORREÇÃO CRÍTICA 2: Falha de segurança e acesso do Motorista ao painel Diretor
         async function validarEEntrar(user) {
             try {
                 const snap = await db.ref(`users_roles/${user.uid}`).once('value');
                 
-                // SEGURANÇA SÊNIOR: O Padrão para tudo é "motorista" (O nível mais baixo de privilégio)
+                // O Padrão para TUDO é "motorista". O Painel Admin é um cofre trancado.
                 let role = 'motorista'; 
 
                 if(snap.exists()) {
                     role = snap.val().role || 'motorista';
                 } else {
-                    // Proteção Exclusiva da Diretoria: Apenas o seu email oficial do JSON vira Gestor se a base falhar
-                    if (user.email === 'admin@aed.com') {
+                    // Proteção Exclusiva da Diretoria: Apenas o e-mail oficial (como no seu JSON)
+                    if (user.email === 'aed@aed.com' || user.email === 'admin@aed.com') {
                         role = 'gestor';
                     }
-                    // Tenta escrever no DB a regra nova para fins de registro.
-                    await db.ref(`users_roles/${user.uid}`).set({ email: user.email, role: role }).catch(()=>console.warn("Write rule handled."));
+                    await db.ref(`users_roles/${user.uid}`).set({ email: user.email, role: role }).catch(()=>console.warn("Regra de backup."));
                 }
                 
                 rotearUsuario(user, role);
             } catch (error) {
-                console.error("Falha ao ler privilégios. Adotando modo restrito.");
+                console.error("Falha ao ler privilégios. Adotando segurança máxima (Motorista).");
                 rotearUsuario(user, 'motorista');
             }
         }
@@ -773,14 +784,14 @@
             
             carregarConfiguracoesEmpresa(); 
 
-            // Validação estrita
+            // Validação de ecrã estrita
             if(role === 'gestor') {
                 document.getElementById('admin-view').classList.remove('hidden-view');
                 document.getElementById('user-display').innerText = user.email.split('@')[0];
                 carregarDadosAdmin();
                 nav('dashboard');
             } else {
-                // Modo App Celular Seguro para Motoristas e Montadores
+                // Modo App Celular Seguro para Motoristas e Equipe Operacional
                 document.getElementById('motorista-view').classList.remove('hidden-view');
                 document.getElementById('mot-nome-display').innerText = user.email.split('@')[0];
                 iniciarArquiteturaMotorista(); 
@@ -805,20 +816,21 @@
         function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
-        // Módulo de importação pendente
         window.importarExcel = (event) => {
-            alert("A importação de planilhas Excel (XLSX/CSV) será integrada na próxima atualização.");
+            alert("A importação de planilhas Excel (XLSX/CSV) será ativada na próxima atualização estrutural.");
             if(event.target) event.target.value = ''; 
         };
 
-        // --- E. PAINEL DO GESTOR (CRUDS 100% DESDOBRADOS E FORMATADOS) ---
+        // --- E. PAINEL DO GESTOR (CRUDS BLINDADOS CONTRA BUGS) ---
         function carregarDadosAdmin() {
             
-            // 1. Renderização Expandida de Clientes
+            // 1. Clientes
             db.ref(`${DB_ROOT}/clientes`).on('value', snap => {
                 const dados = []; 
                 snap.forEach(c => { dados.push({...c.val(), id: c.key}); });
-                document.getElementById('dash-clientes').innerText = dados.length;
+                
+                const elDashClientes = document.getElementById('dash-clientes');
+                if(elDashClientes) elDashClientes.innerText = dados.length;
                 
                 let html = '';
                 dados.forEach(c => {
@@ -840,10 +852,10 @@
                     </tr>
                     `;
                 });
-                document.getElementById('lista-clientes').innerHTML = html;
+                if(document.getElementById('lista-clientes')) document.getElementById('lista-clientes').innerHTML = html;
             });
 
-            // 2. Renderização Expandida de Equipe (Motoristas/Montadores)
+            // 2. Equipe
             db.ref(`${DB_ROOT}/equipe`).on('value', snap => {
                 const dados = []; 
                 snap.forEach(c => { dados.push({...c.val(), id: c.key}); });
@@ -869,14 +881,16 @@
                     </div>
                     `;
                 });
-                document.getElementById('lista-equipe').innerHTML = html;
+                if(document.getElementById('lista-equipe')) document.getElementById('lista-equipe').innerHTML = html;
             });
 
-            // 3. Renderização Expandida e Avançada de Frota
+            // 3. Frota (Corrigido o null pointer)
             db.ref(`${DB_ROOT}/frota`).on('value', snap => {
                 const dados = []; 
                 snap.forEach(c => { dados.push({...c.val(), id: c.key}); });
-                document.getElementById('dash-frota').innerText = dados.length;
+                
+                const elDashFrota = document.getElementById('dash-frota');
+                if(elDashFrota) elDashFrota.innerText = dados.length;
                 
                 let html = '';
                 dados.forEach(f => {
@@ -914,14 +928,16 @@
                     </div>
                     `;
                 });
-                document.getElementById('lista-frota').innerHTML = html;
+                if(document.getElementById('lista-frota')) document.getElementById('lista-frota').innerHTML = html;
             });
 
-            // 4. Renderização Expandida de Cargas
+            // 4. Romaneios / Cargas
             db.ref(`${DB_ROOT}/cargas`).on('value', snap => {
                 const dados = []; 
                 snap.forEach(c => { dados.push({...c.val(), id: c.key}); });
-                document.getElementById('dash-cargas').innerText = dados.filter(d => d.status === 'Em Rota').length;
+                
+                const elDashCargas = document.getElementById('dash-cargas');
+                if(elDashCargas) elDashCargas.innerText = dados.filter(d => d.status === 'Em Rota').length;
                 
                 let html = '';
                 dados.reverse().forEach(c => {
@@ -956,14 +972,16 @@
                     </tr>
                     `;
                 });
-                document.getElementById('lista-cargas').innerHTML = html;
+                if(document.getElementById('lista-cargas')) document.getElementById('lista-cargas').innerHTML = html;
             });
 
-            // 5. Renderização Expandida de Ocorrências / Gastos
+            // 5. Ocorrências (Cloudinary)
             db.ref(`${DB_ROOT}/ocorrencias`).on('value', snap => {
                 const dados = []; 
                 snap.forEach(c => { dados.push({...c.val(), id: c.key}); });
-                document.getElementById('dash-ocorrencias').innerText = dados.length;
+                
+                const elDashOcorrencias = document.getElementById('dash-ocorrencias');
+                if(elDashOcorrencias) elDashOcorrencias.innerText = dados.length;
                 
                 let html = '';
                 dados.reverse().forEach(o => {
@@ -1004,7 +1022,7 @@
                     </div>
                     `;
                 });
-                document.getElementById('lista-ocorrencias').innerHTML = html;
+                if(document.getElementById('lista-ocorrencias')) document.getElementById('lista-ocorrencias').innerHTML = html;
             });
 
             // 6. Mapas em tempo real
@@ -1021,7 +1039,8 @@
                         }
                     }
                 }
-                document.getElementById('dash-gps-ativos').innerText = countAtivos;
+                const elDashGps = document.getElementById('dash-gps-ativos');
+                if(elDashGps) elDashGps.innerText = countAtivos;
             });
         }
 
@@ -1032,7 +1051,6 @@
             btn.innerHTML = "<div class='loader border-t-white mx-auto'></div>"; 
             btn.disabled = true;
             try {
-                // Instância Secundária blinda o Gestor de ser desconectado.
                 const cred = await secondaryAuth.createUserWithEmailAndPassword(document.getElementById('eq-email').value, document.getElementById('eq-senha').value);
                 
                 await db.ref(`users_roles/${cred.user.uid}`).set({ 
@@ -1405,15 +1423,22 @@
             }
         };
 
-        // --- G. MAPAS DO GOOGLE E CÉREBRO IA COMERCIAL ---
-        let mapsLoading = false;
+        // --- G. MAPAS DO GOOGLE E CÉREBRO IA COMERCIAL (COM ALERTAS DE DIAGNÓSTICO) ---
         function loadGoogleMapsScript() {
             if(mapsLoaded || mapsLoading || !GOOGLE_MAPS_KEY) return;
             mapsLoading = true;
+            
+            // CORREÇÃO CRÍTICA 3: Inicialização garantida do Google Maps via Callback oficial.
+            window.initGoogleMaps = () => {
+                mapsLoaded = true; 
+                mapsLoading = false; 
+                checkMap('rastreio'); 
+                checkMap('rota'); 
+            };
+            
             const s = document.createElement('script');
-            s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`;
-            s.onload = () => { mapsLoaded = true; mapsLoading = false; checkMap('rastreio'); checkMap('rota'); };
-            s.onerror = () => { mapsLoading = false; console.error("Falha ao carregar API do Google Maps"); };
+            s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=initGoogleMaps`;
+            s.onerror = () => { mapsLoading = false; console.error("Falha de rede ao carregar a API do Google Maps."); };
             document.head.appendChild(s);
         }
         
@@ -1448,7 +1473,7 @@
                     position: pos, 
                     map: mapRastreioObj, 
                     title: `${placa} - Condutor: ${motorista}`, 
-                    icon: "https://maps.google.com/mapfiles/ms/icons/truck.png" 
+                    icon: "https://maps.google.com/mapfiles/ms/icons/truck.png" // HTTPS forçado para evitar bloqueios de navegador
                 });
                 
                 const info = new google.maps.InfoWindow({
@@ -1458,7 +1483,7 @@
             }
         }
 
-        // MOTOR DE VENDAS CRUZADAS E RADAR
+        // MOTOR DE VENDAS CRUZADAS E RADAR (COM DIAGNÓSTICO DE ERRO DIRETO)
         let routeMarkers = [];
         window.analisarRotaReal = () => {
             const org = document.getElementById('origem-rota').value;
@@ -1466,10 +1491,10 @@
             const term = document.getElementById('termo-busca').value;
             
             if(!org || !dst || !directionsService) {
-                return alert("Parâmetros Insuficientes: Preencha Origem e Destino do percurso e ative as chaves no cofre.");
+                return alert("Aviso de Sistema: Preencha as cidades e aguarde o Satélite (Mapa) carregar completamente na tela.");
             }
             
-            document.getElementById('btn-analisar-rota').innerHTML = "<div class='loader border-t-white mx-auto'></div> Executando Varredura...";
+            document.getElementById('btn-analisar-rota').innerHTML = "<div class='loader border-t-white mx-auto'></div> Mapeando Estrada...";
             routeMarkers.forEach(m => m.setMap(null)); 
             routeMarkers = [];
             
@@ -1478,14 +1503,17 @@
                     directionsRenderer.setDirections(res);
                     placesService.textSearch({ query: term, bounds: res.routes[0].bounds }, (places, pStatus) => {
                         document.getElementById('btn-analisar-rota').innerHTML = "<i class='bx bx-radar text-amber-500 text-xl'></i> Reiniciar Radar de Clientes";
-                        if(pStatus === 'OK' && places.length > 0) {
+                        
+                        if(pStatus === 'OK' && places && places.length > 0) {
                             renderizarPlaces(places);
-                        } else {
+                        } else if (pStatus === 'ZERO_RESULTS') {
                             document.getElementById('lista-prospeccao').innerHTML = "<div class='text-center py-10'><i class='bx bx-ghost text-6xl text-slate-300 mb-2'></i><p class='font-bold text-slate-500'>Nenhum alvo comercial detectado no caminho.</p></div>";
+                        } else {
+                            alert("ALERTA DE API (Google Places): O Google recusou a busca de clientes. Código de Erro: " + pStatus + ". Verifique se o serviço 'Places API' está habilitado e com faturação ativa no painel do Google Cloud.");
                         }
                     });
                 } else {
-                    alert("Acesso Negado à Malha Viária. Rota impossível de ser traçada por estradas oficiais.");
+                    alert("ALERTA DE API (Google Directions): O Google não conseguiu traçar a rota. Código de Erro: " + status + ". Pode ser cidade inválida ou serviço 'Directions API' desativado na sua chave.");
                     document.getElementById('btn-analisar-rota').innerHTML = "<i class='bx bx-radar text-amber-500 text-xl'></i> Iniciar Radar de Clientes";
                 }
             });
