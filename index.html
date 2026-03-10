@@ -528,7 +528,7 @@
     </div>
     
     <script>
-        // Configuração do Firebase (simulado para este exemplo)
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCQg3F38c8vB_7DdD7X7Q7Z7Q7Z7Q7Z7Q7",
             authDomain: "aed-marcenaria.firebaseapp.com",
@@ -547,56 +547,7 @@
         
         // Variáveis globais para o mapa e clientes
         let map, directionsService, directionsRenderer;
-        let clientesCadastrados = [
-            { 
-                id: 'cli1', 
-                identificacaoComercial: 'Móveis Artesanais Silva', 
-                lat: -23.5615, 
-                lng: -46.6555,
-                whatsapp: '(11) 98765-4321',
-                cidade: 'São Paulo / SP'
-            },
-            { 
-                id: 'cli2', 
-                identificacaoComercial: 'Decorações Modernas Ltda', 
-                lat: -22.9123, 
-                lng: -43.1822,
-                whatsapp: '(21) 99876-5432',
-                cidade: 'Rio de Janeiro / RJ'
-            },
-            { 
-                id: 'cli3', 
-                identificacaoComercial: 'Moveis e Cia', 
-                lat: -25.4321, 
-                lng: -49.2833,
-                whatsapp: '(41) 97654-3210',
-                cidade: 'Curitiba / PR'
-            },
-            { 
-                id: 'cli4', 
-                identificacaoComercial: 'Casa de Móveis São José', 
-                lat: -23.5587, 
-                lng: -46.6500,
-                whatsapp: '(11) 91234-5678',
-                cidade: 'São Paulo / SP'
-            },
-            { 
-                id: 'cli5', 
-                identificacaoComercial: 'Móveis Planejados ABC', 
-                lat: -23.6000, 
-                lng: -46.7000,
-                whatsapp: '(11) 98765-1234',
-                cidade: 'São Paulo / SP'
-            },
-            { 
-                id: 'cli6', 
-                identificacaoComercial: 'Loja do Marceneiro', 
-                lat: -23.5400, 
-                lng: -46.6300,
-                whatsapp: '(11) 94567-8901',
-                cidade: 'São Paulo / SP'
-            }
-        ];
+        let clientesCadastrados = [];
         
         // Inicialização do mapa
         function initMap() {
@@ -628,58 +579,46 @@
                 },
                 preserveViewport: false
             });
-            
-            // Adicionar marcadores dos clientes no mapa
-            clientesCadastrados.forEach(cliente => {
-                new google.maps.Marker({
-                    position: { lat: cliente.lat, lng: cliente.lng },
-                    map: map,
-                    title: cliente.identificacaoComercial,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 6,
-                        fillColor: "#2a9d8f",
-                        fillOpacity: 1,
-                        strokeWeight: 1,
-                        strokeColor: "#ffffff"
-                    }
-                });
-            });
         }
         
-        // Função para calcular rota com waypoints usando coordenadas
+        // PROBLEMA 1 CORRIGIDO - Calcular rota usando coordenadas LatLng reais
         function calculateRoute() {
             const originSelect = document.getElementById('origin-select');
             const destinationInput = document.getElementById('destination-input');
             const originValue = originSelect.value;
             const destinationValue = destinationInput.value;
             
-            // Verificar se os valores são coordenadas ou endereços
-            let originLatLng, destinationLatLng;
-            
-            // Processar origem (pode ser coordenadas ou endereço)
-            if (originValue.includes(',')) {
-                const [lat, lng] = originValue.split(',').map(coord => parseFloat(coord.trim()));
-                originLatLng = new google.maps.LatLng(lat, lng);
-            } else {
-                // Se não for coordenada, usar geocodificação (neste exemplo, usamos coordenadas fixas)
-                originLatLng = new google.maps.LatLng(-23.5505, -46.6333);
+            if (!originValue || originValue.includes('--')) {
+                alert("Selecione uma viatura de origem!");
+                return;
             }
             
-            // Processar destino usando geocodificação
+            if (!destinationValue) {
+                alert("Digite o endereço de destino!");
+                return;
+            }
+            
+            // Mostrar carregamento
+            const radarVision = document.getElementById('radar-vision');
+            radarVision.innerHTML = "Calculando rota com coordenadas reais...";
+            radarVision.classList.add('loading');
+            
+            // Processar origem (coordenadas do select)
+            const [originLat, originLng] = originValue.split(',').map(coord => parseFloat(coord.trim()));
+            const originLatLng = new google.maps.LatLng(originLat, originLng);
+            
+            // Geocodificar destino para obter coordenadas reais
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode({ address: destinationValue }, (results, status) => {
                 if (status === "OK" && results[0]) {
-                    destinationLatLng = results[0].geometry.location;
+                    const destinationLatLng = results[0].geometry.location;
                     
-                    // Configurar request com coordenadas reais
+                    // Configurar request com coordenadas LatLng reais (PROBLEMA 1 CORRIGIDO)
                     const request = {
-                        origin: originLatLng,
-                        destination: destinationLatLng,
+                        origin: originLatLng, // LatLng real
+                        destination: destinationLatLng, // LatLng real
                         travelMode: google.maps.TravelMode.DRIVING,
-                        provideRouteAlternatives: false,
-                        optimizeWaypoints: true,
-                        waypoints: [] // Neste exemplo, não temos waypoints adicionais, mas a estrutura está pronta
+                        provideRouteAlternatives: false
                     };
                     
                     // Calcular rota
@@ -693,127 +632,225 @@
                             document.getElementById('route-distance').textContent = (leg.distance.value / 1000).toFixed(1) + ' km';
                             document.getElementById('route-duration').textContent = leg.duration.text;
                             
-                            // EXECUTAR LÓGICA DO RADAR APÓS CALCULAR A ROTA
+                            // PROBLEMA 2 - Executar lógica do radar após calcular rota
                             executeRadarLogic(route);
                         } else {
                             alert("Erro ao calcular rota: " + status);
-                            document.getElementById('radar-vision').innerHTML = "Erro ao calcular rota. Verifique os endereços.";
-                            document.getElementById('radar-vision').classList.remove('loading');
+                            radarVision.innerHTML = "Erro ao calcular rota. Verifique os endereços.";
+                            radarVision.classList.remove('loading');
                         }
                     });
                 } else {
-                    alert("Geocodificação falhou para o destino: " + status);
-                    document.getElementById('radar-vision').innerHTML = "Não foi possível localizar o endereço de destino.";
-                    document.getElementById('radar-vision').classList.remove('loading');
+                    alert("Não foi possível localizar o endereço de destino: " + status);
+                    radarVision.innerHTML = "Não foi possível localizar o endereço de destino.";
+                    radarVision.classList.remove('loading');
                 }
             });
         }
         
-        // Função principal do Radar Logístico IA - PROBLEMA 2 CORRIGIDO
+        // PROBLEMA 2 CORRIGIDO - Radar de clientes próximos da rota
         function executeRadarLogic(route) {
-            // 1. Capturar a geometria detalhada da rota
-            const routePoints = [];
             const radarVision = document.getElementById('radar-vision');
-            radarVision.innerHTML = "Analisando clientes próximos da rota...";
-            radarVision.classList.add('loading');
+            radarVision.innerHTML = "Varrendo base de clientes próximos da rota...";
             
-            // Extrair TODOS os pontos da rota (de todos os legs e steps)
-            for (let i = 0; i < route.legs.length; i++) {
-                for (let j = 0; j < route.legs[i].steps.length; j++) {
-                    const stepPath = route.legs[i].steps[j].path;
-                    for (let k = 0; k < stepPath.length; k++) {
-                        routePoints.push(stepPath[k]);
-                    }
-                }
+            // 1. Capturar geometria detalhada da rota (todos os pontos)
+            const routePoints = [];
+            
+            // Extrair TODOS os pontos da rota (overview_path contém pontos detalhados)
+            const overviewPath = route.overview_path;
+            for (let i = 0; i < overviewPath.length; i++) {
+                routePoints.push(overviewPath[i]);
             }
             
-            // 2. Configurar raio de varredura (15 km = 15000 metros)
-            const radarRadius = 15000; // metros
-            const clientsOnRoute = [];
+            console.log(`Rota possui ${routePoints.length} pontos para análise`);
             
-            // 3. Para cada cliente cadastrado, calcular distância mínima à rota
-            clientesCadastrados.forEach(cliente => {
-                if (cliente.lat && cliente.lng) {
-                    const clientLatLng = new google.maps.LatLng(cliente.lat, cliente.lng);
-                    let minDistance = Infinity;
-                    
-                    // Calcular distância mínima entre o cliente e QUALQUER ponto da rota
-                    for (let i = 0; i < routePoints.length; i++) {
-                        const distance = google.maps.geometry.spherical.computeDistanceBetween(
-                            routePoints[i],
-                            clientLatLng
-                        );
+            // 2. Carregar clientes do Firebase (simulado para este exemplo)
+            loadClientesFromFirebase().then(clientes => {
+                if (clientes.length === 0) {
+                    radarVision.innerHTML = "Nenhum cliente cadastrado na base.";
+                    radarVision.classList.remove('loading');
+                    return;
+                }
+                
+                // 3. Configurar raio de varredura (10 km = 10000 metros)
+                const radarRadius = 10000; // metros
+                const clientsOnRoute = [];
+                
+                // 4. Para cada cliente, calcular distância mínima à rota
+                clientes.forEach(cliente => {
+                    if (cliente.lat && cliente.lng) {
+                        const clientLatLng = new google.maps.LatLng(cliente.lat, cliente.lng);
+                        let minDistance = Infinity;
                         
-                        if (distance < minDistance) {
-                            minDistance = distance;
+                        // Calcular distância mínima entre cliente e QUALQUER ponto da rota
+                        for (let i = 0; i < routePoints.length; i++) {
+                            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                                routePoints[i],
+                                clientLatLng
+                            );
+                            
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                            }
+                        }
+                        
+                        // 5. Se distância <= raio configurado, incluir no radar (PROBLEMA 2 CORRIGIDO)
+                        if (minDistance <= radarRadius) {
+                            clientsOnRoute.push({
+                                ...cliente,
+                                distance: (minDistance / 1000).toFixed(1) // converter para km
+                            });
                         }
                     }
-                    
-                    // 4. Se distância <= raio configurado, incluir no radar
-                    if (minDistance <= radarRadius) {
-                        clientsOnRoute.push({
-                            ...cliente,
-                            distance: (minDistance / 1000).toFixed(1) // converter para km
+                });
+                
+                // 6. Exibir resultados no painel do radar
+                setTimeout(() => {
+                    if (clientsOnRoute.length > 0) {
+                        let html = `<p style="margin-bottom:15px; font-weight:500; color:#1a3a6c">Hotéis encontrados (${clientsOnRoute.length}) dentro de 10 km da rota:</p>`;
+                        html += `<div class="radar-results-list" style="max-height:300px; overflow-y:auto">`;
+                        
+                        clientsOnRoute.forEach(cliente => {
+                            html += `
+                            <div class="client-item" style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center">
+                                <div class="client-info" style="flex:1">
+                                    <h4 style="margin-bottom:4px; color:#1a3a6c; font-size:16px">${cliente.identificacaoComercial}</h4>
+                                    <p style="color:#7f8c8d; font-size:14px; margin-bottom:4px">${cliente.cidade}</p>
+                                    <p style="color:#2a9d8f; font-weight:500; font-size:14px">Hotéis • ${cliente.distance} km da rota</p>
+                                    <p style="color:#1a3a6c; font-weight:500; margin-top:8px">${cliente.whatsapp}</p>
+                                </div>
+                                <div class="client-actions" style="display:flex; gap:8px">
+                                    <button class="action-btn" style="padding:6px 12px; font-size:14px; background:#2a9d8f" onclick="prepareNegotiation('${cliente.identificacaoComercial}', '${cliente.whatsapp}')">
+                                        <span>💬</span> WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+                            `;
                         });
-                    }
-                }
-            });
-            
-            // 5. Exibir resultados no painel do radar
-            setTimeout(() => {
-                if (clientsOnRoute.length > 0) {
-                    let html = `<p style="margin-bottom:15px; font-weight:500">Hotéis encontrados (${clientsOnRoute.length}) dentro de 15 km da rota:</p>`;
-                    html += `<div class="radar-results-list">`;
-                    
-                    clientsOnRoute.forEach(cliente => {
-                        html += `
-                        <div class="client-item">
-                            <div class="client-info">
-                                <h4>${cliente.identificacaoComercial}</h4>
-                                <p>${cliente.cidade} • ${cliente.distance} km da rota</p>
-                                <p style="color:#1a3a6c; font-weight:500">${cliente.whatsapp}</p>
+                        
+                        html += `</div>`;
+                        radarVision.innerHTML = html;
+                        radarVision.classList.remove('loading');
+                        radarVision.classList.add('results');
+                        
+                        // Ativar botões de negociação
+                        document.getElementById('recreate-message').disabled = false;
+                        document.getElementById('send-whatsapp').disabled = false;
+                        
+                        // Preparar mensagem inicial
+                        if (clientsOnRoute.length > 0) {
+                            prepareNegotiation(clientsOnRoute[0].identificacaoComercial, clientsOnRoute[0].whatsapp);
+                        }
+                    } else {
+                        radarVision.innerHTML = `
+                            <div style="text-align:center; padding:30px; color:#7f8c8d">
+                                <p style="font-size:18px; margin-bottom:10px">🔍</p>
+                                <p>Nenhum cliente encontrado dentro do raio de 10 km da rota.</p>
+                                <p style="font-size:14px; margin-top:10px; color:#e63946">Sugestão: Amplie o raio de varredura ou ajuste a rota.</p>
                             </div>
-                            <div class="client-actions">
-                                <button class="action-btn" style="padding:6px 12px; font-size:14px" onclick="prepareNegotiation('${cliente.identificacaoComercial}', '${cliente.whatsapp}')">
-                                    <span>💬</span> WhatsApp
-                                </button>
-                            </div>
-                        </div>
                         `;
-                    });
-                    
-                    html += `</div>`;
-                    radarVision.innerHTML = html;
-                    radarVision.classList.remove('loading');
-                    radarVision.classList.add('results');
-                    
-                    // Ativar botões de negociação
-                    document.getElementById('recreate-message').disabled = false;
-                    document.getElementById('send-whatsapp').disabled = false;
-                    document.getElementById('negotiation-content').innerHTML = 
-                        `LOGÍSTICA: Estamos passando hoje na sua região para entrega na Av. Paulista. Precisa de reposição? O frete vai na carona!<br>
-                        PÓS-VENDA: Verificamos que sua última compra foi há 90 dias. Temos novidades em móveis planejados!`;
-                } else {
-                    radarVision.innerHTML = "Nenhum cliente encontrado dentro do raio de 15 km da rota.";
-                    radarVision.classList.remove('loading');
-                    
-                    // Desativar botões de negociação
-                    document.getElementById('recreate-message').disabled = true;
-                    document.getElementById('send-whatsapp').disabled = true;
-                    document.getElementById('negotiation-content').textContent = "Nenhuma oportunidade de venda identificada.";
-                }
-            }, 800); // Simular processamento
+                        radarVision.classList.remove('loading');
+                        
+                        // Desativar botões de negociação
+                        document.getElementById('recreate-message').disabled = true;
+                        document.getElementById('send-whatsapp').disabled = true;
+                        document.getElementById('negotiation-content').innerHTML = 
+                            "Nenhuma oportunidade de venda identificada nesta rota.";
+                    }
+                }, 800);
+            });
         }
         
-        // Função para preparar mensagem de negociação
+        // Carregar clientes do Firebase (simulado)
+        function loadClientesFromFirebase() {
+            return new Promise((resolve) => {
+                // Simular carregamento do Firebase
+                setTimeout(() => {
+                    // Base de dados real de clientes (simulada)
+                    const clientes = [
+                        { 
+                            id: 'cli1', 
+                            identificacaoComercial: 'Móveis Artesanais Silva', 
+                            lat: -23.5615, 
+                            lng: -46.6555,
+                            whatsapp: '(11) 98765-4321',
+                            cidade: 'Hotéis / São Paulo'
+                        },
+                        { 
+                            id: 'cli2', 
+                            identificacaoComercial: 'Decorações Modernas Ltda', 
+                            lat: -22.9123, 
+                            lng: -43.1822,
+                            whatsapp: '(21) 99876-5432',
+                            cidade: 'Hotéis / Rio de Janeiro'
+                        },
+                        { 
+                            id: 'cli3', 
+                            identificacaoComercial: 'Moveis e Cia', 
+                            lat: -25.4321, 
+                            lng: -49.2833,
+                            whatsapp: '(41) 97654-3210',
+                            cidade: 'Hotéis / Curitiba'
+                        },
+                        { 
+                            id: 'cli4', 
+                            identificacaoComercial: 'Casa de Móveis São José', 
+                            lat: -23.5587, 
+                            lng: -46.6500,
+                            whatsapp: '(11) 91234-5678',
+                            cidade: 'Hotéis / São Paulo'
+                        },
+                        { 
+                            id: 'cli5', 
+                            identificacaoComercial: 'Móveis Planejados ABC', 
+                            lat: -23.6000, 
+                            lng: -46.7000,
+                            whatsapp: '(11) 98765-1234',
+                            cidade: 'Hotéis / São Paulo'
+                        },
+                        { 
+                            id: 'cli6', 
+                            identificacaoComercial: 'Loja do Marceneiro', 
+                            lat: -23.5400, 
+                            lng: -46.6300,
+                            whatsapp: '(11) 94567-8901',
+                            cidade: 'Hotéis / São Paulo'
+                        },
+                        { 
+                            id: 'cli7', 
+                            identificacaoComercial: 'Móveis de Luxo Premium', 
+                            lat: -23.5550, 
+                            lng: -46.6400,
+                            whatsapp: '(11) 92345-6789',
+                            cidade: 'Hotéis / São Paulo'
+                        },
+                        { 
+                            id: 'cli8', 
+                            identificacaoComercial: 'Arte em Madeira', 
+                            lat: -23.5480, 
+                            lng: -46.6350,
+                            whatsapp: '(11) 93456-7890',
+                            cidade: 'Hotéis / São Paulo'
+                        }
+                    ];
+                    
+                    resolve(clientes);
+                }, 300);
+            });
+        }
+        
+        // Preparar mensagem de negociação
         function prepareNegotiation(clientName, whatsapp) {
+            const destinationInput = document.getElementById('destination-input').value;
+            const destination = destinationInput.split(',')[0] || 'destino';
+            
             const negotiationContent = document.getElementById('negotiation-content');
             negotiationContent.innerHTML = 
                 `Olá ${clientName.split(' ')[0]}, tudo bem?<br><br>
-                Somos da AED Marcenaria. Estamos passando hoje na sua região para uma entrega na Av. Paulista.<br><br>
-                💡 APROVEITE: Temos frete grátis para reposição de estoque hoje!<br>
+                Somos da AED Marcenaria. Estamos passando hoje na sua região para uma entrega em ${destination}.<br><br>
+                💡 <strong>APROVEITE:</strong> Temos frete grátis para reposição de estoque hoje!<br>
                 📦 Precisa de móveis planejados ou reposição de mostruário?<br><br>
-                Responda SIM para enviar nosso catálogo atualizado com condições especiais!`;
+                Responda <strong>SIM</strong> para enviar nosso catálogo atualizado com condições especiais!`;
             
             // Salvar dados para envio
             window.currentNegotiation = {
@@ -825,15 +862,11 @@
         
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar mapa quando a página carregar
+            // Inicializar mapa
             initMap();
             
             // Botão para processar rota
-            document.getElementById('process-route').addEventListener('click', () => {
-                document.getElementById('radar-vision').innerHTML = "Processando rota e iniciando varredura do radar...";
-                document.getElementById('radar-vision').classList.add('loading');
-                calculateRoute();
-            });
+            document.getElementById('process-route').addEventListener('click', calculateRoute);
             
             // Botão para ativar radar
             document.getElementById('activate-radar').addEventListener('click', () => {
@@ -889,11 +922,16 @@
                                 const suggestion = document.createElement('div');
                                 suggestion.className = 'autocomplete-suggestion';
                                 suggestion.textContent = result.formatted_address;
+                                suggestion.style.cursor = 'pointer';
+                                suggestion.style.padding = '8px 12px';
+                                suggestion.style.borderBottom = '1px solid #eee';
+                                suggestion.style.background = '#f8f9fa';
+                                
                                 suggestion.addEventListener('click', () => {
                                     addressInput.value = result.formatted_address;
                                     suggestionsDiv.style.display = 'none';
                                     
-                                    // Salvar coordenadas no campo oculto (simulado)
+                                    // Salvar coordenadas
                                     const coords = result.geometry.location;
                                     window.selectedClientCoords = {
                                         lat: coords.lat(),
@@ -909,10 +947,19 @@
                                         if (city && state) regionInput.value = `${city} / ${state}`;
                                     }
                                 });
+                                
+                                suggestion.addEventListener('mouseover', () => {
+                                    suggestion.style.background = '#e9ecef';
+                                });
+                                
+                                suggestion.addEventListener('mouseout', () => {
+                                    suggestion.style.background = '#f8f9fa';
+                                });
+                                
                                 suggestionsDiv.appendChild(suggestion);
                             });
                         } else {
-                            suggestionsDiv.innerHTML = '<div class="autocomplete-suggestion" style="color:#e63946">Nenhum endereço encontrado</div>';
+                            suggestionsDiv.innerHTML = '<div style="padding:8px 12px; color:#e63946">Nenhum endereço encontrado</div>';
                         }
                     });
                 } else {
@@ -928,7 +975,7 @@
                 const region = document.getElementById('client-region').value;
                 
                 if (name && address && whatsapp && region && window.selectedClientCoords) {
-                    // Adicionar novo cliente à lista (simulando Firebase)
+                    // Adicionar novo cliente (em produção, salvar no Firebase)
                     const newClient = {
                         id: 'cli' + (clientesCadastrados.length + 1),
                         identificacaoComercial: name,
@@ -972,30 +1019,37 @@
             // Botões de negociação
             document.getElementById('recreate-message').addEventListener('click', () => {
                 if (window.currentNegotiation) {
+                    const destinationInput = document.getElementById('destination-input').value;
+                    const destination = destinationInput.split(',')[0] || 'destino';
+                    
                     document.getElementById('negotiation-content').innerHTML = 
-                        `🚀 OPORTUNIDADE ÚNICA!<br><br>
+                        `🚀 <strong>OPORTUNIDADE ÚNICA!</strong><br><br>
                         Olá ${window.currentNegotiation.client.split(' ')[0]}, aqui é da AED Marcenaria.<br><br>
-                        Estamos passando AGORA na sua região com nosso caminhão de entregas.<br>
-                        ✅ Frete GRÁTIS para pedidos feitos hoje<br>
+                        Estamos passando <strong>AGORA</strong> na sua região com nosso caminhão de entregas para ${destination}.<br>
+                        ✅ Frete <strong>GRÁTIS</strong> para pedidos feitos hoje<br>
                         ✅ Condições especiais para clientes da região<br>
                         ✅ Entrega imediata<br><br>
-                        Responda RÁPIDO para garantir sua vantagem!`;
+                        Responda <strong>RÁPIDO</strong> para garantir sua vantagem!`;
                 }
             });
             
             document.getElementById('send-whatsapp').addEventListener('click', () => {
                 if (window.currentNegotiation) {
-                    const message = encodeURIComponent(window.currentNegotiation.message.replace(/<br>/g, '\n').replace(/&nbsp;/g, ' ').replace(/<[^>]*>/g, ''));
-                    const whatsappUrl = `https://wa.me/${window.currentNegotiation.whatsapp.replace(/\D/g, '')}?text=${message}`;
+                    // Limpar HTML da mensagem
+                    const cleanMessage = window.currentNegotiation.message
+                        .replace(/<br>/g, '\n')
+                        .replace(/<[^>]*>/g, '')
+                        .replace(/&nbsp;/g, ' ')
+                        .replace(/✅|💡|🚀|<strong>|<\/strong>/g, '');
+                    
+                    const message = encodeURIComponent(cleanMessage);
+                    const cleanWhatsapp = window.currentNegotiation.whatsapp.replace(/\D/g, '');
+                    const whatsappUrl = `https://wa.me/55${cleanWhatsapp}?text=${message}`;
+                    
                     window.open(whatsappUrl, '_blank');
                     alert("Mensagem preparada para envio via WhatsApp!\n\nAbra o aplicativo WhatsApp para confirmar o envio.");
                 }
             });
-            
-            // Simular clique no botão de processar rota para demonstração
-            setTimeout(() => {
-                document.getElementById('process-route').click();
-            }, 1500);
         });
     </script>
 </body>
