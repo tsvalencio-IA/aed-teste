@@ -492,7 +492,7 @@
         </div>
     </div>
 
-    <!-- ================= 5. MODAIS INTEGRATIVOS (INCLUINDO NOVOS MOTORES DE EDIÇÃO) ================= -->
+    <!-- ================= 5. MODAIS INTEGRATIVOS ================= -->
     
     <!-- Modal Atribuir Veículo (LIBERAR ROTA) -->
     <div id="modal-atribuir-veiculo" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] hidden items-center justify-center p-4">
@@ -567,6 +567,30 @@
                 <p class="text-[9px] text-slate-400 uppercase tracking-widest text-center mt-2 border-t pt-4">Nota: O E-mail e Senha de acesso ao App não podem ser alterados por aqui por segurança. Exclua e recrie caso necessário trocar a credencial.</p>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs tracking-widest shadow-xl mt-2 sm:mt-4 active:scale-95 transition-all">Salvar Modificações</button>
                 <button type="button" onclick="window.fecharModal('modal-edit-equipe')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Romaneio (Adicionar Destino) -->
+    <div id="modal-carga" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border-t-8 border-t-red-600 max-h-[95vh] overflow-y-auto">
+            <div class="p-4 sm:p-6 border-b bg-slate-50 flex justify-between items-center">
+                <h3 class="font-black text-slate-800 uppercase text-xs sm:text-sm tracking-tight flex items-center gap-2"><i class='bx bx-rocket text-red-600 text-lg sm:text-xl'></i> Adicionar Destino à Rota</h3>
+                <button onclick="window.fecharModal('modal-carga')" class="text-slate-400 hover:text-red-500 transition"><i class='bx bx-x text-2xl sm:text-3xl'></i></button>
+            </div>
+            <form id="form-carga" class="p-5 sm:p-8 space-y-4 sm:space-y-5">
+                
+                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Motorista Responsável pela Viagem</label>
+                <select id="carga-motorista" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                
+                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mt-4">Ponto de Descarga (Morada do Cliente)</label>
+                <select id="carga-cliente" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                
+                <input type="text" id="carga-nfe" placeholder="Nº da NFe (Ex: 12345)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest font-mono outline-none focus:border-red-500 transition shadow-inner mt-4">
+                
+                <textarea id="carga-desc" placeholder="Resumo da Mercadoria (Ex: Chapas de MDF)" rows="3" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm resize-none outline-none focus:border-red-500 transition shadow-inner mt-4"></textarea>
+                
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all mt-4">Salvar Destino no Romaneio</button>
             </form>
         </div>
     </div>
@@ -1523,8 +1547,15 @@
         window.abrirModalCarga = function() {
             db.ref(`${DB_ROOT}/equipe`).once('value', snap => { 
                 let h = '<option value="">1. Selecione o Motorista</option>'; 
-                if(snap.exists()) { snap.forEach(e => { if(e.val().cargo === 'motorista') { h += `<option value="${e.val().email}" data-nome="${e.val().nome}">${e.val().nome}</option>`; } }); } 
-                const cm = document.getElementById('carga-motorista'); if(cm) cm.innerHTML = h; 
+                if(snap.exists()) { 
+                    snap.forEach(e => { 
+                        if(e.val().cargo === 'motorista') { 
+                            h += `<option value="${e.val().email}" data-nome="${e.val().nome}">${e.val().nome}</option>`; 
+                        } 
+                    }); 
+                } 
+                const cm = document.getElementById('carga-motorista'); 
+                if(cm) cm.innerHTML = h; 
             });
             
             db.ref(`${DB_ROOT}/clientes`).once('value', snap => { 
@@ -1535,8 +1566,10 @@
                         h += `<option value="${endCompleto}" data-nome="${c.val().nome}">${c.val().nome} (${c.val().cid})</option>`; 
                     }); 
                 } 
-                const cc = document.getElementById('carga-cliente'); if(cc) cc.innerHTML = h; 
+                const cc = document.getElementById('carga-cliente'); 
+                if(cc) cc.innerHTML = h; 
             });
+            
             window.abrirModal('modal-carga');
         };
 
@@ -1544,11 +1577,12 @@
         if(frmCarga) {
             frmCarga.onsubmit = (e) => {
                 e.preventDefault(); 
+                
                 const sm = document.getElementById('carga-motorista'); 
                 const selCliente = document.getElementById('carga-cliente');
                 
                 db.ref(`${DB_ROOT}/cargas`).push({ 
-                    veiculo: '', // EM BRANCO, POIS SERÁ ESCOLHIDO AO LIBERAR
+                    veiculo: '', // Fica em branco até o Admin despachar o caminhão
                     motorista_email: sm.value, 
                     motorista_nome: sm.options[sm.selectedIndex].getAttribute('data-nome'), 
                     destino: selCliente.options[selCliente.selectedIndex].getAttribute('data-nome'), 
@@ -1558,7 +1592,9 @@
                     status: 'Montando Rota', 
                     data: Date.now() 
                 });
-                window.fecharModal('modal-carga'); e.target.reset();
+                
+                window.fecharModal('modal-carga'); 
+                e.target.reset();
             };
         }
 
