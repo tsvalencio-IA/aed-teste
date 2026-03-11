@@ -579,9 +579,7 @@
                 <button onclick="window.fecharModal('modal-carga')" class="text-slate-400 hover:text-red-500 transition"><i class='bx bx-x text-2xl sm:text-3xl'></i></button>
             </div>
             
-            <!-- BLINDAGEM: O SELETOR DE VEICULO FOI REMOVIDO PARA DESTRAVAR O BOTAO DE SALVAR -->
             <form id="form-carga" class="p-5 sm:p-8 space-y-4 sm:space-y-5">
-                
                 <div>
                     <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Motorista Responsável pela Viagem</label>
                     <select id="carga-motorista" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
@@ -598,6 +596,43 @@
                 
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all mt-4">Salvar Destino no Romaneio</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal IA Vendas -->
+    <div id="modal-ia" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[250] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto flex flex-col">
+            <div class="bg-slate-900 p-4 sm:p-6 text-white flex justify-between items-center border-b-4 border-amber-500 flex-shrink-0">
+                <h3 class="font-black uppercase text-[10px] sm:text-xs tracking-widest flex items-center gap-2 sm:gap-3"><i class='bx bx-brain text-amber-500 text-xl sm:text-2xl'></i> Negociação IA</h3>
+                <button onclick="window.fecharModal('modal-ia')" class="text-slate-400 hover:text-white transition"><i class='bx bx-x text-2xl sm:text-3xl'></i></button>
+            </div>
+            <div class="p-4 sm:p-8 flex-grow overflow-y-auto">
+                <div class="bg-amber-50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 shadow-inner">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-amber-600 text-2xl sm:text-3xl flex-shrink-0"><i class='bx bxs-store'></i></div>
+                    <div class="w-full">
+                        <p id="ia-store-name" class="font-black text-slate-800 uppercase text-xs sm:text-sm mb-1 leading-none">Limpando...</p>
+                        <p id="ia-store-address" class="text-[9px] sm:text-[10px] text-slate-500 font-black uppercase mb-2 sm:mb-3 tracking-tight line-clamp-2">Processando endereço...</p>
+                        <input type="text" id="ia-store-phone" placeholder="WhatsApp" class="w-full p-2 sm:p-3 border border-amber-200 rounded-xl text-[10px] sm:text-xs font-black bg-white focus:ring-1 focus:ring-amber-500 outline-none transition shadow-sm">
+                    </div>
+                </div>
+                <select id="ia-contexto" class="w-full p-3 sm:p-4 mb-4 sm:mb-5 border-2 border-slate-100 rounded-2xl text-[9px] sm:text-xs font-black uppercase bg-slate-50 tracking-widest outline-none transition focus:border-amber-400" onchange="window.gerarTextoIA()">
+                    <option value="frete_gratis">LOGÍSTICA: Aproveitar Rota (Isenção Total Frete)</option>
+                    <option value="manutencao">PÓS-VENDA: Revisão Preventiva na Região</option>
+                </select>
+                <div class="relative">
+                    <textarea id="ia-texto" class="w-full h-32 sm:h-48 p-4 sm:p-6 border-2 border-slate-100 rounded-2xl sm:rounded-[2rem] text-xs sm:text-sm resize-none leading-relaxed text-slate-700 bg-slate-50 shadow-inner outline-none focus:border-amber-400 transition" spellcheck="false"></textarea>
+                    <div id="ia-loading" class="absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center hidden rounded-2xl sm:rounded-[2rem]">
+                        <div class="loader mb-2 sm:mb-3 !border-t-amber-500 border-4"></div>
+                        <p class="text-[9px] sm:text-[10px] font-black text-amber-600 animate-pulse uppercase tracking-widest px-2 text-center">O Cérebro IA está redigindo...</p>
+                    </div>
+                </div>
+                <div class="mt-4 sm:mt-8 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <button onclick="window.gerarTextoIA()" class="w-full sm:flex-1 border-2 border-slate-100 hover:border-slate-200 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase rounded-xl sm:rounded-2xl transition active:scale-95">Recriar</button>
+                    <button onclick="window.enviarWpp()" class="w-full sm:flex-[2] bg-green-600 hover:bg-green-700 text-white py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase rounded-xl sm:rounded-2xl shadow-xl transition active:scale-95 flex justify-center items-center gap-2 border border-green-400">
+                        <i class='bx bxl-whatsapp text-xl sm:text-2xl'></i> Disparar WhatsApp
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -625,6 +660,67 @@
                     <i class='bx bx-check-double text-lg sm:text-xl'></i> Salvar e Concluir Visita
                 </button>
                 <button type="button" onclick="window.fecharModal('modal-visita-motorista')" class="w-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cliente (Cadastro Novo) -->
+    <div id="modal-cliente" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-store text-red-600'></i> Nova Loja na Base</h3>
+            <form id="form-cliente" class="space-y-3 sm:space-y-4">
+                <input type="text" id="cli-nome" placeholder="Nome Comercial" required class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="cli-tel" placeholder="WhatsApp" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
+                    <input type="text" id="cli-cidade" placeholder="Cidade (UF)" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 p-2 sm:p-3 rounded-xl mb-1 mt-1 sm:mt-2">
+                    <p class="text-[8px] sm:text-[9px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-1"><i class='bx bx-check-shield'></i> Geocodificação Exata Google API</p>
+                    <p class="text-[9px] sm:text-[10px] text-blue-600 mt-1 leading-tight">Ao digitar abaixo, **CLIQUE OBRIGATORIAMENTE NA SUGESTÃO DO GOOGLE** que aparecer na lista para gravar as coordenadas perfeitas.</p>
+                </div>
+                
+                <input type="text" id="cli-end" placeholder="Pesquise o Endereço Físico Completo..." required class="w-full p-3 sm:p-4 border-2 border-slate-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 focus:border-blue-500 focus:bg-white outline-none transition">
+                
+                <button type="submit" class="w-full bg-red-600 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all mt-2">Gravar Cliente e Coordenadas</button>
+                <button type="button" onclick="window.fecharModal('modal-cliente')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2 hover:text-slate-600 transition">Cancelar Operação</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Frota -->
+    <div id="modal-frota" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-truck text-red-600'></i> Novo Veículo</h3>
+            <form id="form-frota" class="space-y-3 sm:space-y-4">
+                <input type="text" id="fr-placa" placeholder="Placa Mercosul" required class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl uppercase font-black tracking-widest text-xs sm:text-sm">
+                <input type="text" id="fr-modelo" placeholder="Ex: Iveco Daily" required class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold">
+                <select id="fr-status" class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase bg-white">
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Oficina">Em Manutenção</option>
+                </select>
+                <button type="submit" class="w-full bg-red-600 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all">Registar Viatura</button>
+                <button type="button" onclick="window.fecharModal('modal-frota')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Sair</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Ocorrencia -->
+    <div id="modal-ocorrencia" class="fixed inset-0 bg-slate-900/90 hidden items-center justify-center z-[200] p-4">
+        <div class="bg-slate-800 rounded-[2.5rem] w-full max-w-sm p-6 sm:p-8 text-white shadow-2xl border border-slate-700 max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm tracking-widest flex items-center gap-2 sm:gap-3"><i class='bx bx-receipt text-blue-500 text-xl sm:text-2xl'></i> Relatar Evento de Estrada</h3>
+            <form id="form-ocorrencia" class="space-y-4 sm:space-y-5">
+                <select id="oco-tipo" class="w-full p-3 sm:p-3.5 rounded-xl bg-slate-900 text-white border border-slate-600 outline-none focus:border-blue-500 font-bold text-xs sm:text-sm">
+                    <option value="Pedágio">Portagem / Pedágio</option>
+                    <option value="Combustível">Diesel / Arla</option>
+                    <option value="Oficina">Reparo de Emergência</option>
+                    <option value="Almoço">Refeição / Pernoite</option>
+                </select>
+                <input type="number" step="0.01" id="oco-valor" placeholder="Custo R$" class="w-full p-3 sm:p-3.5 rounded-xl bg-slate-900 border border-slate-700 text-blue-400 font-black text-xl sm:text-2xl text-center">
+                <input type="file" id="oco-foto" accept="image/*" capture="environment" class="w-full text-[9px] sm:text-[10px] text-slate-400 border border-slate-700 p-2 rounded-xl">
+                <textarea id="oco-desc" placeholder="Detalhes do ocorrido..." required class="w-full p-3 sm:p-3.5 rounded-xl bg-slate-900 text-white border border-slate-600 resize-none outline-none focus:border-blue-500 text-xs sm:text-sm transition"></textarea>
+                <button type="submit" id="btn-salvar-ocorrencia" class="w-full bg-blue-600 text-white p-3 sm:p-4 rounded-xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95">Concluir Envio</button>
+                <button type="button" onclick="window.fecharModal('modal-ocorrencia')" class="w-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Descartar</button>
             </form>
         </div>
     </div>
@@ -894,7 +990,6 @@
             }
         };
 
-        // --- MOTOR LOGÍSTICO V5 (COM PREVENÇÃO DE CRASH FATAL E CORREÇÃO DE EXCLUSÃO DE ENTREGAS) ---
         window.analisarRotaClientesBase = async function() {
             const placa = document.getElementById('radar-veiculo').value;
             const btn = document.getElementById('btn-analisar-rota');
@@ -950,8 +1045,6 @@
             const romaneioAtivo = [];
             const destinosParaExcluirDoRadar = [];
 
-            // BLINDAGEM DO RADAR: Só exclui do radar as lojas que o motorista AINDA VAI entregar hoje. 
-            // Se ele já entregou, a loja FICA no radar para você oferecer mais coisas!
             cgSnap.forEach(c => { 
                 const val = c.val();
                 if(val.status === 'Em Rota' || val.status === 'Montando Rota') {
@@ -1064,7 +1157,12 @@
                 
                 document.getElementById('rota-stats').classList.remove('hidden');
                 document.getElementById('stat-dist').innerText = (tDist / 1000).toFixed(1) + " km";
-                document.getElementById('stat-tempo').innerText = Math.floor(tTime / 3600) > 0 ? `${Math.floor(tTime / 3600)}h ${Math.floor((tTime % 3600) / 60)}m` : `${Math.floor((tTime % 3600) / 60)}m`;
+                
+                // CORREÇÃO DO TEMPO DE TRÂNSITO "0m"
+                let horas = Math.floor(tTime / 3600);
+                let minutos = Math.floor((tTime % 3600) / 60);
+                if (horas === 0 && minutos === 0 && tTime > 0) minutos = 1;
+                document.getElementById('stat-tempo').innerText = horas > 0 ? `${horas}h ${minutos}m` : `${minutos}m`;
                 
                 if(!google.maps.geometry || !google.maps.geometry.spherical) return alert("Erro crítico: A biblioteca esférica não inicializou.");
                 
@@ -1282,9 +1380,8 @@
             const prompt = `Aja como o Diretor de Logística da AED Marcenaria. Escreva uma mensagem de WhatsApp para o cliente cadastrado "${activePlaceDetails.name}" (Cidade/Local: ${activePlaceDetails.address}). Contexto: Estamos a planear a rota logística dos próximos dias e o nosso caminhão vai passar obrigatoriamente na região ou estrada deles para realizar outras entregas. A nossa estratégia com eles agora é: "${ctx}". Instruções: Como já são nossos clientes, seja cordial e próximo. O grande benefício é que podemos colocar mercadoria, alguma peça de reposição à "boleia" no caminhão com ZERO CUSTO DE FRETE ou mesmo fazer uma visita e tomar um cafezinho. Não envie a mensagem como se o caminhão estivesse à porta agora, mostre que estamos a organizar a logística semanal. Use 2 ou 3 emojis, tom profissional mas atencioso, e feche com uma pergunta que gere interação imediata.`;
             
             try {
-                // VOLTAMOS AO ENDPOINT PREVIEW OFICIAL DESTE AMBIENTE:
-                // Por questões de infraestrutura de compilação de código deste servidor sandbox, a Google EXIGE essa string de endpoint.
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, { 
+                // MODELO FIXO 2.5 FLASH OFICIAL conforme exigência da Google.
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, { 
                     method: 'POST', 
                     headers: {'Content-Type':'application/json'}, 
                     body: JSON.stringify({ contents: [{parts:[{text: prompt}]}] }) 
