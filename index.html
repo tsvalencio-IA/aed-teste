@@ -504,7 +504,7 @@
             <form id="form-atribuir-veiculo" class="p-5 sm:p-8 space-y-4 sm:space-y-5">
                 <input type="hidden" id="atr-motorista-email">
                 <p id="atr-motorista-nome-display" class="text-center font-black text-slate-800 uppercase text-sm mb-4"></p>
-                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest sm:-mb-3 ml-1">Selecione o Caminhão / Viatura para o Trajeto</label>
+                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Selecione o Caminhão para o Trajeto</label>
                 <select id="atr-veiculo" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-green-500"></select>
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all flex justify-center gap-2 items-center"><i class='bx bx-rocket text-xl'></i> Confirmar e Despachar</button>
             </form>
@@ -578,17 +578,23 @@
                 <h3 class="font-black text-slate-800 uppercase text-xs sm:text-sm tracking-tight flex items-center gap-2"><i class='bx bx-rocket text-red-600 text-lg sm:text-xl'></i> Adicionar Destino à Rota</h3>
                 <button onclick="window.fecharModal('modal-carga')" class="text-slate-400 hover:text-red-500 transition"><i class='bx bx-x text-2xl sm:text-3xl'></i></button>
             </div>
+            
+            <!-- BLINDAGEM: O SELETOR DE VEICULO FOI REMOVIDO PARA DESTRAVAR O BOTAO DE SALVAR -->
             <form id="form-carga" class="p-5 sm:p-8 space-y-4 sm:space-y-5">
                 
-                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Motorista Responsável pela Viagem</label>
-                <select id="carga-motorista" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                <div>
+                    <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Motorista Responsável pela Viagem</label>
+                    <select id="carga-motorista" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                </div>
                 
-                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mt-4">Ponto de Descarga (Morada do Cliente)</label>
-                <select id="carga-cliente" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                <div>
+                    <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Ponto de Descarga (Morada do Cliente)</label>
+                    <select id="carga-cliente" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-red-500"></select>
+                </div>
                 
-                <input type="text" id="carga-nfe" placeholder="Nº da NFe (Ex: 12345)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest font-mono outline-none focus:border-red-500 transition shadow-inner mt-4">
+                <input type="text" id="carga-nfe" placeholder="Nº da NFe (Ex: 12345)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest font-mono outline-none focus:border-red-500 transition shadow-inner">
                 
-                <textarea id="carga-desc" placeholder="Resumo da Mercadoria (Ex: Chapas de MDF)" rows="3" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm resize-none outline-none focus:border-red-500 transition shadow-inner mt-4"></textarea>
+                <textarea id="carga-desc" placeholder="Resumo da Mercadoria (Ex: Chapas de MDF)" rows="3" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm resize-none outline-none focus:border-red-500 transition shadow-inner"></textarea>
                 
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all mt-4">Salvar Destino no Romaneio</button>
             </form>
@@ -619,30 +625,6 @@
                     <i class='bx bx-check-double text-lg sm:text-xl'></i> Salvar e Concluir Visita
                 </button>
                 <button type="button" onclick="window.fecharModal('modal-visita-motorista')" class="w-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Cancelar</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Cliente (Cadastro Novo) -->
-    <div id="modal-cliente" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
-            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-store text-red-600'></i> Nova Loja na Base</h3>
-            <form id="form-cliente" class="space-y-3 sm:space-y-4">
-                <input type="text" id="cli-nome" placeholder="Nome Comercial" required class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="cli-tel" placeholder="WhatsApp" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
-                    <input type="text" id="cli-cidade" placeholder="Cidade (UF)" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-200 p-2 sm:p-3 rounded-xl mb-1 mt-1 sm:mt-2">
-                    <p class="text-[8px] sm:text-[9px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-1"><i class='bx bx-check-shield'></i> Geocodificação Exata Google API</p>
-                    <p class="text-[9px] sm:text-[10px] text-blue-600 mt-1 leading-tight">Ao digitar abaixo, **CLIQUE OBRIGATORIAMENTE NA SUGESTÃO DO GOOGLE** que aparecer na lista para gravar as coordenadas perfeitas.</p>
-                </div>
-                
-                <input type="text" id="cli-end" placeholder="Pesquise o Endereço Físico Completo..." required class="w-full p-3 sm:p-4 border-2 border-slate-200 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 focus:border-blue-500 focus:bg-white outline-none transition">
-                
-                <button type="submit" class="w-full bg-red-600 text-white p-4 sm:p-5 rounded-xl sm:rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all mt-2">Gravar Cliente e Coordenadas</button>
-                <button type="button" onclick="window.fecharModal('modal-cliente')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2 hover:text-slate-600 transition">Cancelar Operação</button>
             </form>
         </div>
     </div>
@@ -681,6 +663,17 @@
         
         let driverMarkerMap = null;
         let wakeLock = null; 
+
+        // Função de escape suprema (BLINDA ASPAS E QUEBRAS DE LINHA NO HTML)
+        function escapeHtml(str) { 
+            if (!str) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\') 
+                .replace(/'/g, "\\'")   
+                .replace(/"/g, '&quot;')
+                .replace(/\n/g, ' ')    
+                .replace(/\r/g, ''); 
+        }
 
         function getSafeLatLng(lat, lng) {
             if(lat === undefined || lat === null || lat === "" || lng === undefined || lng === null || lng === "") return null;
@@ -901,7 +894,6 @@
             }
         };
 
-        // --- MOTOR LOGÍSTICO V4 (COM PREVENÇÃO DE CRASH FATAL E CORREÇÃO DE EXCLUSÃO) ---
         window.analisarRotaClientesBase = async function() {
             const placa = document.getElementById('radar-veiculo').value;
             const btn = document.getElementById('btn-analisar-rota');
@@ -913,7 +905,6 @@
             btn.innerHTML = "<div class='loader border-t-amber-400 mx-auto'></div> Rastreando Caminhão Agora...";
             routeMarkers.forEach(m => { m.map = null; }); routeMarkers = [];
 
-            // NOVIDADE: PEGA A LOCALIZAÇÃO AO VIVO DO CAMINHÃO NO MOMENTO DO CLIQUE
             let originLatLng = null;
             let originSourceMsg = "Texto Base";
             
@@ -928,7 +919,6 @@
 
             const geocoder = new google.maps.Geocoder();
             
-            // Fallback se o satélite falhar
             if (!originLatLng) {
                 const org = document.getElementById('origem-rota').value;
                 if(org.includes(',')) {
@@ -1107,7 +1097,6 @@
                     if(!cli) continue; 
                     const cliName = cli.nome ? String(cli.nome).toUpperCase().trim() : "";
                     
-                    // A LOGICA DO RADAR: Se está entregue, ele passa do filtro e PODE ser radar! Só exclui os que ainda não foram entregues.
                     if(cliName && destinosExcluidos.includes(cliName)) continue; 
 
                     const safeLatLng = getSafeLatLng(cli.lat, cli.lng);
@@ -1167,9 +1156,10 @@
                     const rawName = c.nome ? String(c.nome) : "Cliente Desconhecido";
                     const rawAddress = (c.end || c.cid) ? String(c.end || c.cid) : "Endereço não informado";
                     
-                    const escN = rawName.replace(/'/g, "\\'"); 
-                    const escA = rawAddress.replace(/'/g, "\\'"); 
-                    const telefoneReal = c.tel ? String(c.tel) : '';
+                    // AGORA BLINDADO COM ESCAPEHTML PARA NAO QUEBRAR O BOTAO
+                    const escN = escapeHtml(rawName); 
+                    const escA = escapeHtml(rawAddress); 
+                    const telefoneReal = escapeHtml(c.tel ? String(c.tel) : '');
                     const distKmVis = (c.dist / 1000).toFixed(1);
 
                     h += `
@@ -1261,10 +1251,16 @@
         };
 
         window.abrirPitchIA = function(n, l, t) {
-            activePlaceDetails = { name: n, address: l, phone: t.replace(/\D/g,'') };
-            document.getElementById('ia-store-name').innerText = n;
-            document.getElementById('ia-store-address').innerText = l;
-            document.getElementById('ia-store-phone').value = activePlaceDetails.phone.startsWith('55') ? activePlaceDetails.phone : '55'+activePlaceDetails.phone;
+            const safePhone = t ? String(t).replace(/\D/g,'') : '';
+            activePlaceDetails = { name: n, address: l, phone: safePhone };
+            
+            document.getElementById('ia-store-name').innerText = n || 'Sem Nome';
+            document.getElementById('ia-store-address').innerText = l || 'Endereço não cadastrado';
+            
+            let phoneVal = activePlaceDetails.phone;
+            if(phoneVal && !phoneVal.startsWith('55')) phoneVal = '55' + phoneVal;
+            document.getElementById('ia-store-phone').value = phoneVal;
+            
             window.abrirModal('modal-ia'); window.gerarTextoIA();
         };
 
@@ -1282,7 +1278,6 @@
             const prompt = `Aja como o Diretor de Logística da AED Marcenaria. Escreva uma mensagem de WhatsApp para o cliente cadastrado "${activePlaceDetails.name}" (Cidade/Local: ${activePlaceDetails.address}). Contexto: Estamos a planear a rota logística dos próximos dias e o nosso caminhão vai passar obrigatoriamente na região ou estrada deles para realizar outras entregas. A nossa estratégia com eles agora é: "${ctx}". Instruções: Como já são nossos clientes, seja cordial e próximo. O grande benefício é que podemos colocar mercadoria, alguma peça de reposição à "boleia" no caminhão com ZERO CUSTO DE FRETE ou mesmo fazer uma visita e tomar um cafezinho. Não envie a mensagem como se o caminhão estivesse à porta agora, mostre que estamos a organizar a logística semanal. Use 2 ou 3 emojis, tom profissional mas atencioso, e feche com uma pergunta que gere interação imediata.`;
             
             try {
-                // MODELO 2.5 FLASH OFICIAL (Aprovado na migração do e-mail do Google)
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, { 
                     method: 'POST', 
                     headers: {'Content-Type':'application/json'}, 
@@ -1312,11 +1307,12 @@
         window.enviarWpp = function() { 
             const num = document.getElementById('ia-store-phone').value; 
             const txt = document.getElementById('ia-texto').value; 
-            if(num && txt) { window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`, '_blank'); } 
+            if(num && txt && num.length > 8) { 
+                window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`, '_blank'); 
+            } else {
+                alert("Ação negada: Aguarde a IA redigir a mensagem e verifique se o número do WhatsApp está preenchido corretamente.");
+            }
         };
-
-        // Função de escape para atributos de botões HTML
-        function escapeHtml(str) { return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
         function carregarMecanismoAdmin() {
             db.ref(`${DB_ROOT}/clientes`).on('value', snap => {
@@ -1582,7 +1578,7 @@
                 const selCliente = document.getElementById('carga-cliente');
                 
                 db.ref(`${DB_ROOT}/cargas`).push({ 
-                    veiculo: '', // Fica em branco até o Admin despachar o caminhão
+                    veiculo: '', 
                     motorista_email: sm.value, 
                     motorista_nome: sm.options[sm.selectedIndex].getAttribute('data-nome'), 
                     destino: selCliente.options[selCliente.selectedIndex].getAttribute('data-nome'), 
