@@ -894,6 +894,7 @@
             }
         };
 
+        // --- MOTOR LOGÍSTICO V5 (COM PREVENÇÃO DE CRASH FATAL E CORREÇÃO DE EXCLUSÃO DE ENTREGAS) ---
         window.analisarRotaClientesBase = async function() {
             const placa = document.getElementById('radar-veiculo').value;
             const btn = document.getElementById('btn-analisar-rota');
@@ -949,9 +950,13 @@
             const romaneioAtivo = [];
             const destinosParaExcluirDoRadar = [];
 
+            // BLINDAGEM DO RADAR: Só exclui do radar as lojas que o motorista AINDA VAI entregar hoje. 
+            // Se ele já entregou, a loja FICA no radar para você oferecer mais coisas!
             cgSnap.forEach(c => { 
                 const val = c.val();
-                if(val.destino) destinosParaExcluirDoRadar.push(val.destino.toUpperCase().trim());
+                if(val.status === 'Em Rota' || val.status === 'Montando Rota') {
+                    if(val.destino) destinosParaExcluirDoRadar.push(val.destino.toUpperCase().trim());
+                }
                 if(val.status === 'Em Rota') romaneioAtivo.push({...val, id: c.key}); 
             });
 
@@ -1156,7 +1161,6 @@
                     const rawName = c.nome ? String(c.nome) : "Cliente Desconhecido";
                     const rawAddress = (c.end || c.cid) ? String(c.end || c.cid) : "Endereço não informado";
                     
-                    // AGORA BLINDADO COM ESCAPEHTML PARA NAO QUEBRAR O BOTAO
                     const escN = escapeHtml(rawName); 
                     const escA = escapeHtml(rawAddress); 
                     const telefoneReal = escapeHtml(c.tel ? String(c.tel) : '');
@@ -1278,7 +1282,9 @@
             const prompt = `Aja como o Diretor de Logística da AED Marcenaria. Escreva uma mensagem de WhatsApp para o cliente cadastrado "${activePlaceDetails.name}" (Cidade/Local: ${activePlaceDetails.address}). Contexto: Estamos a planear a rota logística dos próximos dias e o nosso caminhão vai passar obrigatoriamente na região ou estrada deles para realizar outras entregas. A nossa estratégia com eles agora é: "${ctx}". Instruções: Como já são nossos clientes, seja cordial e próximo. O grande benefício é que podemos colocar mercadoria, alguma peça de reposição à "boleia" no caminhão com ZERO CUSTO DE FRETE ou mesmo fazer uma visita e tomar um cafezinho. Não envie a mensagem como se o caminhão estivesse à porta agora, mostre que estamos a organizar a logística semanal. Use 2 ou 3 emojis, tom profissional mas atencioso, e feche com uma pergunta que gere interação imediata.`;
             
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, { 
+                // VOLTAMOS AO ENDPOINT PREVIEW OFICIAL DESTE AMBIENTE:
+                // Por questões de infraestrutura de compilação de código deste servidor sandbox, a Google EXIGE essa string de endpoint.
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`, { 
                     method: 'POST', 
                     headers: {'Content-Type':'application/json'}, 
                     body: JSON.stringify({ contents: [{parts:[{text: prompt}]}] }) 
