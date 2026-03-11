@@ -222,7 +222,7 @@
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Linha do Tempo: Entregas Concluídas, Visitas, Pedágios e Combustível na Rota</p>
                     </div>
                     <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
-                        <div id="lista-ocorrencias" class="relative border-l-2 border-slate-200 ml-2 sm:ml-4 space-y-8 pb-4">
+                        <div id="lista-ocorrencias" class="space-y-6 pb-4">
                             <!-- Timeline Items inserted by JS -->
                         </div>
                     </div>
@@ -562,6 +562,7 @@
                 <select id="edit-eq-cargo" class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl font-black text-[10px] sm:text-xs uppercase bg-white outline-none">
                     <option value="motorista">Motorista da Frota</option>
                     <option value="montador">Montador Externo</option>
+                    <option value="gestor">Gestor (Acesso Total)</option>
                 </select>
                 <input type="text" id="edit-eq-cnh" placeholder="Documento / CNH" class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm bg-slate-50 outline-none">
                 <p class="text-[9px] text-slate-400 uppercase tracking-widest text-center mt-2 border-t pt-4">Nota: O E-mail e Senha de acesso ao App não podem ser alterados por aqui por segurança. Exclua e recrie caso necessário trocar a credencial.</p>
@@ -688,6 +689,46 @@
         </div>
     </div>
     
+    <!-- Modal Equipe (Cadastro Novo) IMPLEMENTADO E RESTAURADO -->
+    <div id="modal-equipe" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-user-plus text-slate-900'></i> Admitir Colaborador</h3>
+            <form id="form-equipe" class="space-y-3 sm:space-y-4">
+                <input type="text" id="eq-nome" placeholder="Nome Completo" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 outline-none">
+                <input type="email" id="eq-email" placeholder="E-mail de Acesso" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 outline-none">
+                <input type="password" id="eq-senha" placeholder="Senha (Mín. 6 caracteres)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 outline-none">
+                <select id="eq-cargo" class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl font-black text-[10px] sm:text-xs uppercase bg-white outline-none">
+                    <option value="motorista">Motorista da Frota</option>
+                    <option value="montador">Montador Externo</option>
+                    <option value="gestor">Gestor (Acesso Total)</option>
+                </select>
+                <input type="text" id="eq-cnh" placeholder="Documento / CNH" class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm bg-slate-50 outline-none">
+                <button type="submit" id="btn-salvar-equipe" class="w-full bg-slate-900 hover:bg-black text-white p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs tracking-widest shadow-xl mt-2 sm:mt-4 active:scale-95 transition-all flex justify-center items-center gap-2"><i class='bx bx-check-circle text-xl'></i> Salvar e Liberar Acesso App</button>
+                <button type="button" onclick="window.fecharModal('modal-equipe')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Oficina / Manutenção IMPLEMENTADO E RESTAURADO -->
+    <div id="modal-manutencao" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bx-wrench text-amber-500'></i> Lançar Serviço de Oficina</h3>
+            <form id="form-manutencao" class="space-y-3 sm:space-y-4">
+                <input type="text" id="man-veiculo" placeholder="Placa do Veículo (Ex: ABC1234)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm font-bold bg-slate-50 uppercase tracking-widest outline-none focus:border-amber-500">
+                <select id="man-tipo" class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl font-black text-[10px] sm:text-xs uppercase bg-white outline-none focus:border-amber-500">
+                    <option value="Manutenção Preventiva">Manutenção Preventiva</option>
+                    <option value="Manutenção Corretiva">Manutenção Corretiva</option>
+                    <option value="Troca de Pneus / Óleo">Troca de Pneus / Óleo</option>
+                    <option value="Lavagem / Estética">Lavagem / Estética</option>
+                </select>
+                <textarea id="man-desc" placeholder="Relatório do Serviço feito..." required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-xs sm:text-sm resize-none outline-none focus:border-amber-500 h-24 shadow-inner"></textarea>
+                <input type="number" step="0.01" id="man-valor" placeholder="Custo Total (R$)" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl text-amber-600 text-lg font-black text-center outline-none focus:border-amber-500">
+                <button type="submit" id="btn-salvar-manutencao" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs tracking-widest shadow-xl mt-2 sm:mt-4 active:scale-95 transition-all">Salvar Ordem de Serviço</button>
+                <button type="button" onclick="window.fecharModal('modal-manutencao')" class="w-full text-slate-400 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Frota -->
     <div id="modal-frota" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
@@ -721,6 +762,31 @@
                 <textarea id="oco-desc" placeholder="Detalhes do ocorrido..." required class="w-full p-3 sm:p-3.5 rounded-xl bg-slate-900 text-white border border-slate-600 resize-none outline-none focus:border-blue-500 text-xs sm:text-sm transition"></textarea>
                 <button type="submit" id="btn-salvar-ocorrencia" class="w-full bg-blue-600 text-white p-3 sm:p-4 rounded-xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95">Concluir Envio</button>
                 <button type="button" onclick="window.fecharModal('modal-ocorrencia')" class="w-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Descartar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Entrega (Motorista) IMPLEMENTADO PARA O RELATÓRIO DO MOTORISTA -->
+    <div id="modal-confirmar-entrega" class="fixed inset-0 bg-slate-900/90 hidden items-center justify-center z-[300] p-4">
+        <div class="bg-slate-800 rounded-[2.5rem] w-full max-w-sm p-6 sm:p-8 text-white shadow-2xl border border-slate-700 border-t-8 border-t-green-500 max-h-[95vh] overflow-y-auto">
+            <h3 class="font-black uppercase mb-2 text-xs sm:text-sm tracking-widest flex items-center gap-2 sm:gap-3"><i class='bx bx-check-double text-green-500 text-xl sm:text-2xl'></i> Relatar Descarga</h3>
+            <p id="display-destino-conf" class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase mb-4 sm:mb-6 tracking-widest">Destino...</p>
+            <form id="form-confirmar-entrega" class="space-y-4">
+                <input type="hidden" id="conf-entrega-id">
+                <input type="hidden" id="conf-entrega-placa">
+                <input type="hidden" id="conf-entrega-destino">
+                <input type="hidden" id="conf-entrega-nfe">
+                
+                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1">Quem Recebeu a Mercadoria?</label>
+                <input type="text" id="conf-recebedor" placeholder="Nome / RG de quem assinou..." required class="w-full p-3 sm:p-4 rounded-xl bg-slate-900 text-white border border-slate-600 outline-none focus:border-green-500 text-xs sm:text-sm font-bold">
+                
+                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1 mt-2">Ocorrências na Descarga?</label>
+                <textarea id="conf-obs" placeholder="Ex: Recebido com avaria, faltou item, tudo certo..." required class="w-full p-3 sm:p-4 rounded-xl bg-slate-900 text-white border border-slate-600 resize-none outline-none focus:border-green-500 text-xs sm:text-sm transition h-24"></textarea>
+                
+                <button type="submit" id="btn-confirmar-entrega" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 sm:p-5 rounded-xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2 mt-4">
+                    <i class='bx bx-check-shield text-lg sm:text-xl'></i> Salvar e Baixar NFe
+                </button>
+                <button type="button" onclick="window.fecharModal('modal-confirmar-entrega')" class="w-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase mt-2 sm:mt-3 py-2">Voltar ao Mapa</button>
             </form>
         </div>
     </div>
@@ -1377,7 +1443,8 @@
             }
 
             const ctx = document.getElementById('ia-contexto').options[document.getElementById('ia-contexto').selectedIndex].text;
-            const prompt = `Aja como o Diretor de Logística da AED Marcenaria. Escreva uma mensagem de WhatsApp para o cliente cadastrado "${activePlaceDetails.name}" (Cidade/Local: ${activePlaceDetails.address}). Contexto: Estamos a planear a rota logística dos próximos dias e o nosso caminhão vai passar obrigatoriamente na região ou estrada deles para realizar outras entregas. A nossa estratégia com eles agora é: "${ctx}". Instruções: Como já são nossos clientes, seja cordial e próximo. O grande benefício é que podemos colocar mercadoria, alguma peça de reposição à "boleia" no caminhão com ZERO CUSTO DE FRETE ou mesmo fazer uma visita e tomar um cafezinho. Não envie a mensagem como se o caminhão estivesse à porta agora, mostre que estamos a organizar a logística semanal. Use 2 ou 3 emojis, tom profissional mas atencioso, e feche com uma pergunta que gere interação imediata.`;
+            // CORREÇÃO DO PROMPT IA SOLICITADA PELO USUÁRIO (NOME DA DIRETORIA EXATA, SEM "Aja como...")
+            const prompt = `Meu nome é AEDLog Diretor de Logística da AED Marcenaria. Escreva uma mensagem de WhatsApp para o cliente cadastrado "${activePlaceDetails.name}" (Cidade/Local: ${activePlaceDetails.address}). Contexto: Estamos a planear a rota logística dos próximos dias e o nosso caminhão vai passar obrigatoriamente na região ou estrada deles para realizar outras entregas. A nossa estratégia com eles agora é: "${ctx}". Instruções: Como já são nossos clientes, seja cordial e próximo. O grande benefício é que podemos colocar mercadoria, alguma peça de reposição à "boleia" no caminhão com ZERO CUSTO DE FRETE ou mesmo fazer uma visita e tomar um cafezinho. Não envie a mensagem como se o caminhão estivesse à porta agora, mostre que estamos a organizar a logística semanal. Use 2 ou 3 emojis, tom profissional mas atencioso, e feche com uma pergunta que gere interação imediata.`;
             
             try {
                 // MODELO FIXO 2.5 FLASH OFICIAL conforme exigência da Google.
@@ -1442,7 +1509,8 @@
                     if (d.status === 'Entregue') stCls = 'bg-green-100 text-green-700';
                     if (d.status === 'Montando Rota') stCls = 'bg-amber-100 text-amber-700 animate-pulse';
 
-                    const infosEntrega = d.data_entrega ? `<div class="mt-2 text-[8px] font-black text-green-600 bg-green-50 p-1.5 rounded uppercase tracking-widest border border-green-200"><i class='bx bx-check-double'></i> ${new Date(d.data_entrega).toLocaleString('pt-BR')} <br>POR: ${d.entregue_por}</div>` : '';
+                    // ATUALIZAÇÃO: EXIBINDO OS DETALHES DE ENTREGA DO MOTORISTA NO PAINEL ADMIN
+                    const infosEntrega = d.data_entrega ? `<div class="mt-2 text-[8px] font-black text-green-600 bg-green-50 p-1.5 rounded uppercase tracking-widest border border-green-200"><i class='bx bx-check-double'></i> ${new Date(d.data_entrega).toLocaleString('pt-BR')} <br>POR: ${d.entregue_por}<br>ASSINOU: ${d.recebedor || 'N/A'}<br>OBS: ${d.obs_entrega || 'Nenhuma'}</div>` : '';
                     
                     let actBtn = '';
                     if(d.status === 'Montando Rota') {
@@ -1482,41 +1550,62 @@
                 const lo = document.getElementById('lista-oficina'); if(lo) lo.innerHTML = h;
             });
 
+            // ATUALIZAÇÃO AUDITORIA: SEPARANDO POR MOTORISTA/BLOCOS COMO SOLICITADO
             db.ref(`${DB_ROOT}/ocorrencias`).on('value', snap => {
                 const eventos = [];
                 snap.forEach(o => { eventos.push({...o.val(), id: o.key}); });
                 eventos.sort((a,b) => b.data - a.data); 
 
-                let h = ''; let oCount = eventos.length;
+                let oCount = eventos.length;
+                let agrupadosPorMotorista = {};
+                
                 eventos.forEach(d => {
-                    let corDot = 'bg-slate-500';
-                    let corValor = 'text-slate-600';
-                    let icone = "<i class='bx bxs-truck'></i>";
-
-                    if (d.tipo && d.tipo.includes('Visita')) { corDot = 'bg-amber-500'; corValor = 'text-amber-600'; icone = "<i class='bx bx-briefcase'></i>"; }
-                    if (d.tipo && d.tipo.includes('Entrega')) { corDot = 'bg-green-500'; corValor = 'text-green-600'; icone = "<i class='bx bx-check-shield'></i>"; }
-
-                    const lnk = d.imgUrl ? `<a href="${d.imgUrl}" target="_blank" class="block w-max px-4 text-center bg-slate-900 text-white py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] mt-3 shadow-lg active:scale-95 transition">Ver Recibo (R$ ${parseFloat(d.valor||0).toFixed(2)})</a>` : ``;
-                    const renderValor = (d.valor && parseFloat(d.valor)>0 && !d.tipo.includes('Visita') && !d.tipo.includes('Entrega')) ? `<p class="text-lg font-black ${corValor}">R$ ${parseFloat(d.valor||0).toFixed(2)}</p>` : ((d.valor && parseFloat(d.valor)>0) ? `<p class="text-sm font-black ${corValor}">R$ ${parseFloat(d.valor||0).toFixed(2)}</p>` : '');
-
-                    h += `
-                    <div class="relative pl-6">
-                        <div class="absolute -left-[5px] top-1 w-3 h-3 rounded-full ${corDot} shadow shadow-slate-300"></div>
-                        <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm relative hover:shadow-md transition">
-                            <div class="flex justify-between items-start mb-2 border-b border-slate-200 pb-2">
-                                <div>
-                                    <p class="text-[9px] sm:text-[10px] font-black text-slate-800 uppercase tracking-widest">${icone} ${d.tipo}</p>
-                                    <p class="text-[8px] text-slate-400 font-bold uppercase mt-1 tracking-wider"><i class='bx bx-time-five'></i> ${new Date(d.data).toLocaleString('pt-BR')} &bull; VIA: ${d.veiculo}</p>
-                                </div>
-                                ${renderValor}
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 mt-2">Relatado por: <span class="text-blue-600">${d.motorista}</span></p>
-                            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-100 shadow-inner">"${d.desc}"</p>
-                            ${lnk}
-                            <button onclick="window.excluir('ocorrencias', '${d.id}')" class="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition"><i class='bx bx-x text-xl'></i></button>
-                        </div>
-                    </div>`;
+                    let mot = d.motorista || "Sem Identificação";
+                    if(!agrupadosPorMotorista[mot]) agrupadosPorMotorista[mot] = [];
+                    agrupadosPorMotorista[mot].push(d);
                 });
+
+                let h = ''; 
+                
+                for(let mot in agrupadosPorMotorista) {
+                    h += `<div class="bg-slate-50 border border-slate-200 rounded-2xl mb-6 overflow-hidden shadow-sm">
+                            <div class="bg-slate-800 p-3 sm:p-4 text-white flex items-center justify-between">
+                                <h4 class="font-black text-xs sm:text-sm uppercase tracking-widest flex items-center gap-2"><i class='bx bx-user-circle text-amber-500 text-xl'></i> Bloco do Motorista: ${mot}</h4>
+                                <span class="bg-slate-700 text-[9px] px-2 py-1 rounded font-bold">${agrupadosPorMotorista[mot].length} Registros</span>
+                            </div>
+                            <div class="p-4 sm:p-6 space-y-6">`;
+                    
+                    agrupadosPorMotorista[mot].forEach(d => {
+                        let corDot = 'bg-slate-500';
+                        let corValor = 'text-slate-600';
+                        let icone = "<i class='bx bxs-truck'></i>";
+
+                        if (d.tipo && d.tipo.includes('Visita')) { corDot = 'bg-amber-500'; corValor = 'text-amber-600'; icone = "<i class='bx bx-briefcase'></i>"; }
+                        if (d.tipo && d.tipo.includes('Entrega')) { corDot = 'bg-green-500'; corValor = 'text-green-600'; icone = "<i class='bx bx-check-shield'></i>"; }
+
+                        const lnk = d.imgUrl ? `<a href="${d.imgUrl}" target="_blank" class="block w-max px-4 text-center bg-slate-900 text-white py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] mt-3 shadow-lg active:scale-95 transition">Ver Recibo (R$ ${parseFloat(d.valor||0).toFixed(2)})</a>` : ``;
+                        const renderValor = (d.valor && parseFloat(d.valor)>0 && !d.tipo.includes('Visita') && !d.tipo.includes('Entrega')) ? `<p class="text-lg font-black ${corValor}">R$ ${parseFloat(d.valor||0).toFixed(2)}</p>` : ((d.valor && parseFloat(d.valor)>0) ? `<p class="text-sm font-black ${corValor}">R$ ${parseFloat(d.valor||0).toFixed(2)}</p>` : '');
+
+                        h += `
+                        <div class="relative pl-6">
+                            <div class="absolute -left-[5px] top-1 w-3 h-3 rounded-full ${corDot} shadow shadow-slate-300"></div>
+                            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm relative hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2 border-b border-slate-100 pb-2">
+                                    <div>
+                                        <p class="text-[9px] sm:text-[10px] font-black text-slate-800 uppercase tracking-widest">${icone} ${d.tipo}</p>
+                                        <p class="text-[8px] text-slate-400 font-bold uppercase mt-1 tracking-wider"><i class='bx bx-time-five'></i> ${new Date(d.data).toLocaleString('pt-BR')} &bull; VIA: ${d.veiculo}</p>
+                                    </div>
+                                    ${renderValor}
+                                </div>
+                                <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-inner mt-2">"${d.desc}"</p>
+                                ${lnk}
+                                <button onclick="window.excluir('ocorrencias', '${d.id}')" class="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition"><i class='bx bx-x text-xl'></i></button>
+                            </div>
+                        </div>`;
+                    });
+                    
+                    h += `</div></div>`; // Fechamento do Bloco do Motorista
+                }
                 
                 const loc = document.getElementById('lista-ocorrencias'); if(loc) loc.innerHTML = h || "<p class='text-xs font-black text-slate-400 uppercase text-center mt-10'>Sem atividade de campo registrada.</p>";
                 const doc = document.getElementById('dash-ocorrencias'); if(doc) doc.innerText = oCount;
@@ -1551,7 +1640,46 @@
             }
         };
 
-        // ====== MOTORES DE EDIÇÃO (NOVA LÓGICA DE GESTÃO) ======
+        // ====== MOTORES DE EDIÇÃO E CADASTROS NOVOS ======
+
+        // LÓGICA DE CADASTRO DE NOVO CLIENTE IMPLEMENTADA
+        const frmCliente = document.getElementById('form-cliente');
+        if(frmCliente) {
+            frmCliente.onsubmit = (e) => {
+                e.preventDefault();
+                const btn = frmCliente.querySelector('button[type="submit"]'); const oldText = btn.innerHTML;
+                btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Cadastrando..."; btn.disabled = true;
+
+                const nome = document.getElementById('cli-nome').value;
+                const tel = document.getElementById('cli-tel').value;
+                const cid = document.getElementById('cli-cidade').value;
+                const end = document.getElementById('cli-end').value;
+
+                if (clienteGooglePlaceLocation) {
+                    db.ref(`${DB_ROOT}/clientes`).push({ nome, tel, cid, end: clienteGooglePlaceLocation.formatted_address, lat: clienteGooglePlaceLocation.lat, lng: clienteGooglePlaceLocation.lng }).then(() => {
+                        window.fecharModal('modal-cliente'); btn.innerHTML = oldText; btn.disabled = false; frmCliente.reset(); alert("Loja gravada com sucesso e Coordenadas GPS ativadas!");
+                    });
+                } else if (window.google && google.maps.Geocoder) {
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ address: end }, (res, stat) => {
+                        if (stat === 'OK' && res[0]) {
+                            db.ref(`${DB_ROOT}/clientes`).push({ nome, tel, cid, end: res[0].formatted_address, lat: res[0].geometry.location.lat(), lng: res[0].geometry.location.lng() }).then(() => {
+                                window.fecharModal('modal-cliente'); btn.innerHTML = oldText; btn.disabled = false; frmCliente.reset(); alert("Loja gravada. O GPS foi capturado automaticamente pelo Google.");
+                            });
+                        } else {
+                            db.ref(`${DB_ROOT}/clientes`).push({ nome, tel, cid, end }).then(() => {
+                                window.fecharModal('modal-cliente'); btn.innerHTML = oldText; btn.disabled = false; frmCliente.reset(); alert("Loja gravada apenas como texto, sem GPS exato (Alerta no Radar).");
+                            });
+                        }
+                    });
+                } else {
+                    db.ref(`${DB_ROOT}/clientes`).push({ nome, tel, cid, end }).then(() => {
+                        window.fecharModal('modal-cliente'); btn.innerHTML = oldText; btn.disabled = false; frmCliente.reset(); alert("Loja gravada.");
+                    });
+                }
+            };
+        }
+
         window.editarCliente = function(id, nome, tel, cid, end) {
             document.getElementById('edit-cli-id').value = id;
             document.getElementById('edit-cli-nome').value = nome;
@@ -1621,6 +1749,19 @@
             };
         }
 
+        const frmFrota = document.getElementById('form-frota');
+        if(frmFrota) {
+            frmFrota.onsubmit = async (e) => {
+                e.preventDefault();
+                await db.ref(`${DB_ROOT}/frota`).push({
+                    placa: document.getElementById('fr-placa').value.toUpperCase(),
+                    modelo: document.getElementById('fr-modelo').value,
+                    status: document.getElementById('fr-status').value
+                });
+                window.fecharModal('modal-frota'); e.target.reset();
+            };
+        }
+
         window.editarEquipe = function(id, nome, cargo, cnh) {
             document.getElementById('edit-eq-id').value = id;
             document.getElementById('edit-eq-nome').value = nome;
@@ -1639,6 +1780,38 @@
                     cargo: document.getElementById('edit-eq-cargo').value,
                     cnh: document.getElementById('edit-eq-cnh').value
                 }).then(() => { window.fecharModal('modal-edit-equipe'); alert("Dados do Colaborador Atualizados."); });
+            };
+        }
+
+        // LÓGICA DE MANUTENÇÃO / OFICINA IMPLEMENTADA
+        window.abrirModalManutencao = function(placa = '') {
+            document.getElementById('man-veiculo').value = placa;
+            window.abrirModal('modal-manutencao');
+        };
+
+        const frmMan = document.getElementById('form-manutencao');
+        if(frmMan) {
+            frmMan.onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-salvar-manutencao');
+                const oldText = btn.innerHTML; btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Lançando..."; btn.disabled = true;
+                try {
+                    await db.ref(`${DB_ROOT}/manutencao`).push({
+                        veiculo: document.getElementById('man-veiculo').value.toUpperCase(),
+                        tipo: document.getElementById('man-tipo').value,
+                        desc: document.getElementById('man-desc').value,
+                        valor: document.getElementById('man-valor').value || 0,
+                        data: Date.now()
+                    });
+                    
+                    // Atualiza status do veículo para 'Em Oficina'
+                    const p = document.getElementById('man-veiculo').value.toUpperCase();
+                    const snap = await db.ref(`${DB_ROOT}/frota`).orderByChild('placa').equalTo(p).once('value');
+                    snap.forEach(f => { db.ref(`${DB_ROOT}/frota/${f.key}/status`).set('Em Oficina'); });
+
+                    window.fecharModal('modal-manutencao'); e.target.reset(); alert("Serviço de Oficina Registrado com sucesso!");
+                } catch(err) { alert("Erro ao lançar oficina: " + err.message); }
+                finally { btn.innerHTML = oldText; btn.disabled = false; }
             };
         }
 
@@ -1763,6 +1936,7 @@
             db.ref(`${DB_ROOT}/config`).update({ gemini_key: document.getElementById('gemini-key').value, maps_key: mk, cloud_name: document.getElementById('cloud-name').value, upload_preset: document.getElementById('upload-preset').value }).then(() => { alert("As chaves de API foram encriptadas e salvas na Nuvem."); if(mk) window.carregarGoogleMapsRuntime(); }); 
         };
 
+        // LÓGICA DE INSERÇÃO DE EQUIPE NO BANCO E AUTH FIREBASE
         const frmEquipe = document.getElementById('form-equipe');
         if(frmEquipe) {
             frmEquipe.onsubmit = async (e) => { 
@@ -1771,7 +1945,7 @@
                     const cred = await secondaryAuth.createUserWithEmailAndPassword(document.getElementById('eq-email').value, document.getElementById('eq-senha').value);
                     await db.ref(`users_roles/${cred.user.uid}`).set({ email: document.getElementById('eq-email').value, role: document.getElementById('eq-cargo').value });
                     await db.ref(`${DB_ROOT}/equipe/${cred.user.uid}`).set({ nome: document.getElementById('eq-nome').value, cargo: document.getElementById('eq-cargo').value, email: document.getElementById('eq-email').value, cnh: document.getElementById('eq-cnh').value });
-                    await secondaryAuth.signOut(); window.fecharModal('modal-equipe'); e.target.reset(); alert("Acesso gerado com sucesso no Banco.");
+                    await secondaryAuth.signOut(); window.fecharModal('modal-equipe'); e.target.reset(); alert("Acesso de funcionário gerado com sucesso no Banco.");
                 } catch (err) { alert("Erro ao criar acesso. Verifique se o E-mail já existe na base ou se a senha tem pelo menos 6 caracteres."); } 
                 finally { btn.innerHTML = "<i class='bx bx-check-circle text-xl'></i> Salvar e Liberar Acesso App"; btn.disabled = false; }
             };
@@ -1932,7 +2106,7 @@
                             const escDest = escapeHtml(c.destino);
                             const escNfe = escapeHtml(c.nfe);
                             const labelOrdem = (index === sortedPoints.length - 1) ? "DESTINO FINAL (OFICIAL)" : `PARADA ${index + 1} (OTIMIZADA)`;
-                            cartoesCarga += `<div class="bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden mb-5"><div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div><p class="text-[9px] sm:text-[10px] text-blue-400 font-black uppercase mb-1 tracking-widest flex items-center gap-1"><i class='bx bx-map-pin'></i> ${labelOrdem}</p><p class="text-xl sm:text-2xl font-black text-white mb-3 sm:mb-4 leading-tight">${c.destino}</p><div class="bg-slate-900 p-3 sm:p-4 rounded-2xl mb-4 sm:mb-5 border border-slate-700 shadow-inner"><p class="text-xs sm:text-sm font-black text-white border-b border-slate-800 pb-2 sm:pb-3 mb-2 sm:mb-3 flex items-center justify-between"><span class="text-slate-400 font-medium text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-1"><i class='bx bx-barcode'></i> Doc. NFe:</span> <span class="text-blue-400 text-base sm:text-lg">${c.nfe}</span></p><p class="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">${c.desc}</p></div><button onclick="window.motoristaConfirmaEntrega('${c.id}', '${c.veiculo}', '${escDest}', '${escNfe}')" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-black py-4 sm:py-5 rounded-xl sm:rounded-2xl flex justify-center items-center gap-2 shadow-lg transition transform active:scale-95 border border-green-400 uppercase tracking-widest text-[10px] sm:text-sm"><i class='bx bx-check-double text-xl sm:text-2xl drop-shadow'></i> Confirmar Descarga</button></div>`; 
+                            cartoesCarga += `<div class="bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden mb-5"><div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div><p class="text-[9px] sm:text-[10px] text-blue-400 font-black uppercase mb-1 tracking-widest flex items-center gap-1"><i class='bx bx-map-pin'></i> ${labelOrdem}</p><p class="text-xl sm:text-2xl font-black text-white mb-3 sm:mb-4 leading-tight">${c.destino}</p><div class="bg-slate-900 p-3 sm:p-4 rounded-2xl mb-4 sm:mb-5 border border-slate-700 shadow-inner"><p class="text-xs sm:text-sm font-black text-white border-b border-slate-800 pb-2 sm:pb-3 mb-2 sm:mb-3 flex items-center justify-between"><span class="text-slate-400 font-medium text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-1"><i class='bx bx-barcode'></i> Doc. NFe:</span> <span class="text-blue-400 text-base sm:text-lg">${c.nfe}</span></p><p class="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">${c.desc}</p></div><button onclick="window.motoristaAcionaConfirmacao('${c.id}', '${c.veiculo}', '${escDest}', '${escNfe}')" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-black py-4 sm:py-5 rounded-xl sm:rounded-2xl flex justify-center items-center gap-2 shadow-lg transition transform active:scale-95 border border-green-400 uppercase tracking-widest text-[10px] sm:text-sm"><i class='bx bx-check-double text-xl sm:text-2xl drop-shadow'></i> Confirmar Descarga</button></div>`; 
                         });
                         const lCargas = document.getElementById('motorista-lista-cargas'); 
                         if(lCargas) lCargas.innerHTML = cartoesCarga;
@@ -1943,7 +2117,7 @@
                             const c = pt.cargaObj;
                             const escDest = escapeHtml(c.destino);
                             const escNfe = escapeHtml(c.nfe);
-                            fallbackCartoes += `<div class="bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden mb-5"><div class="absolute top-0 left-0 w-2 h-full bg-slate-500"></div><p class="text-xl sm:text-2xl font-black text-white mb-3 sm:mb-4 leading-tight">${c.destino}</p><div class="bg-slate-900 p-3 sm:p-4 rounded-2xl mb-4 sm:mb-5 border border-slate-700 shadow-inner"><p class="text-xs sm:text-sm font-black text-white border-b border-slate-800 pb-2 sm:pb-3 mb-2 sm:mb-3 flex items-center justify-between"><span class="text-slate-400 font-medium text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-1"><i class='bx bx-barcode'></i> Doc. NFe:</span> <span class="text-blue-400 text-base sm:text-lg">${c.nfe}</span></p><p class="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">${c.desc}</p></div><button onclick="window.motoristaConfirmaEntrega('${c.id}', '${c.veiculo}', '${escDest}', '${escNfe}')" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-black py-4 sm:py-5 rounded-xl sm:rounded-2xl flex justify-center items-center gap-2 shadow-lg transition transform active:scale-95 border border-green-400 uppercase tracking-widest text-[10px] sm:text-sm"><i class='bx bx-check-double text-xl sm:text-2xl drop-shadow'></i> Confirmar Descarga</button></div>`; 
+                            fallbackCartoes += `<div class="bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden mb-5"><div class="absolute top-0 left-0 w-2 h-full bg-slate-500"></div><p class="text-xl sm:text-2xl font-black text-white mb-3 sm:mb-4 leading-tight">${c.destino}</p><div class="bg-slate-900 p-3 sm:p-4 rounded-2xl mb-4 sm:mb-5 border border-slate-700 shadow-inner"><p class="text-xs sm:text-sm font-black text-white border-b border-slate-800 pb-2 sm:pb-3 mb-2 sm:mb-3 flex items-center justify-between"><span class="text-slate-400 font-medium text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-1"><i class='bx bx-barcode'></i> Doc. NFe:</span> <span class="text-blue-400 text-base sm:text-lg">${c.nfe}</span></p><p class="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">${c.desc}</p></div><button onclick="window.motoristaAcionaConfirmacao('${c.id}', '${c.veiculo}', '${escDest}', '${escNfe}')" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-black py-4 sm:py-5 rounded-xl sm:rounded-2xl flex justify-center items-center gap-2 shadow-lg transition transform active:scale-95 border border-green-400 uppercase tracking-widest text-[10px] sm:text-sm"><i class='bx bx-check-double text-xl sm:text-2xl drop-shadow'></i> Confirmar Descarga</button></div>`; 
                         });
                         const lCargas = document.getElementById('motorista-lista-cargas'); 
                         if(lCargas) lCargas.innerHTML = fallbackCartoes;
@@ -2012,7 +2186,6 @@
                     });
 
                 } else {
-                    // CÓDIGO MELHORADO: SE O MOTORISTA ACABOU AS ENTREGAS MAS O GPS TÁ LIGADO, O MAPA CONTINUA VISÍVEL PARA O RETORNO A BASE!
                     if(st) st.innerHTML = `<div class="p-6 sm:p-8 text-center"><i class='bx bxs-check-circle text-5xl sm:text-6xl text-green-500 mb-4'></i><p class="text-slate-300 font-black text-lg sm:text-xl mb-1">Entregas Concluídas!</p><p class="text-[10px] sm:text-xs text-slate-500 mt-2 font-medium">Você finalizou todas as rotas ativas.</p></div>`;
                     
                     if(listenerRadarMotorista) { db.ref(`${DB_ROOT}/radar_ativo/${veiculoDoRomaneio}`).off('value', listenerRadarMotorista); listenerRadarMotorista = null; }
@@ -2025,7 +2198,6 @@
                         if(elVisitas) elVisitas.innerHTML = "";
                         try { if(dirRendererMot) dirRendererMot.setDirections({routes: []}); } catch(e){}
                     } else {
-                        // GPS DESLIGADO TOTALMENTE: ESCONDE TUDO
                         veiculoDoRomaneio = null;
                         if(cnt) cnt.classList.add('hidden');
                         if(btnGps) { btnGps.disabled = true; btnGps.className = "w-40 h-40 sm:w-48 sm:h-48 bg-slate-900 border-4 border-slate-800 rounded-full flex flex-col items-center justify-center opacity-40 z-10"; document.getElementById('gps-icon').className = "bx bx-navigation text-5xl sm:text-6xl text-slate-700 mb-2"; document.getElementById('gps-text').className = "font-black text-slate-700 uppercase text-[10px] sm:text-sm tracking-widest leading-tight"; document.getElementById('gps-text').innerText = "SISTEMA\nBLOQUEADO"; }
@@ -2081,38 +2253,71 @@
             };
         }
 
-        // LÓGICA DE AUDITORIA DE ENTREGA
-        window.motoristaConfirmaEntrega = async function(id, placa, destino, nfe) { 
-            if(confirm(`Confirmar a entrega completa para ${destino}? A Base Logística será notificada e a entrega será salva na Auditoria.`)) {
-                
-                await db.ref(`${DB_ROOT}/cargas/${id}`).update({
-                    status: 'Entregue',
-                    data_entrega: Date.now(),
-                    entregue_por: currentDriverName
-                }); 
-                
-                // CRIA O LOG NA AUDITORIA
-                await db.ref(`${DB_ROOT}/ocorrencias`).push({
-                    veiculo: placa || "Indeterminado",
-                    motorista: currentDriverName,
-                    tipo: `Entrega Realizada`,
-                    valor: 0,
-                    desc: `ENTREGA CONCLUÍDA: ${destino} | Doc NFe: ${nfe} | Status: Mercadoria descarregada com sucesso.`,
-                    imgUrl: "",
-                    data: Date.now()
-                });
-
-                db.ref(`${DB_ROOT}/cargas`).once('value', snap => {
-                    let hasMore = false;
-                    if(snap.exists()) { snap.forEach(c => { if(c.val().veiculo === placa && c.val().status === 'Em Rota' && c.key !== id) { hasMore = true; } }); }
-                    if(!hasMore) { db.ref(`${DB_ROOT}/frota`).orderByChild('placa').equalTo(placa).once('value', fSnap => { if(fSnap.exists()) { fSnap.forEach(f => db.ref(`${DB_ROOT}/frota/${f.key}/status`).set('Disponível')); } }); }
-                });
-            }
+        // LÓGICA DE AUDITORIA DE ENTREGA COM RELATÓRIO DO MOTORISTA IMPLEMENTADA
+        window.motoristaAcionaConfirmacao = function(id, placa, destino, nfe) {
+            document.getElementById('conf-entrega-id').value = id;
+            document.getElementById('conf-entrega-placa').value = placa;
+            document.getElementById('conf-entrega-destino').value = destino;
+            document.getElementById('conf-entrega-nfe').value = nfe;
+            document.getElementById('display-destino-conf').innerText = "ENTREGA EM: " + destino;
+            window.abrirModal('modal-confirmar-entrega');
         };
+
+        const frmConfEntrega = document.getElementById('form-confirmar-entrega');
+        if(frmConfEntrega) {
+            frmConfEntrega.onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-confirmar-entrega');
+                const originalBtnText = btn.innerHTML;
+                btn.innerHTML = "<i class='bx bx-loader-alt bx-spin text-xl'></i> Salvando Descarga..."; btn.disabled = true;
+
+                const id = document.getElementById('conf-entrega-id').value;
+                const placa = document.getElementById('conf-entrega-placa').value;
+                const destino = document.getElementById('conf-entrega-destino').value;
+                const nfe = document.getElementById('conf-entrega-nfe').value;
+                const recebedor = document.getElementById('conf-recebedor').value;
+                const obs = document.getElementById('conf-obs').value;
+
+                try {
+                    await db.ref(`${DB_ROOT}/cargas/${id}`).update({
+                        status: 'Entregue',
+                        data_entrega: Date.now(),
+                        entregue_por: currentDriverName,
+                        recebedor: recebedor,
+                        obs_entrega: obs
+                    }); 
+                    
+                    await db.ref(`${DB_ROOT}/ocorrencias`).push({
+                        veiculo: placa || "Indeterminado",
+                        motorista: currentDriverName,
+                        tipo: `Entrega Realizada`,
+                        valor: 0,
+                        desc: `ENTREGA CONCLUÍDA: ${destino} | NFe: ${nfe} | ASSINOU: ${recebedor} | OBS: ${obs}`,
+                        imgUrl: "",
+                        data: Date.now()
+                    });
+
+                    // Verificação para liberar a frota se não houverem mais entregas ativas para esse camião
+                    db.ref(`${DB_ROOT}/cargas`).once('value', snap => {
+                        let hasMore = false;
+                        if(snap.exists()) { snap.forEach(c => { if(c.val().veiculo === placa && c.val().status === 'Em Rota' && c.key !== id) { hasMore = true; } }); }
+                        if(!hasMore) { db.ref(`${DB_ROOT}/frota`).orderByChild('placa').equalTo(placa).once('value', fSnap => { if(fSnap.exists()) { fSnap.forEach(f => db.ref(`${DB_ROOT}/frota/${f.key}/status`).set('Disponível')); } }); }
+                    });
+
+                    window.fecharModal('modal-confirmar-entrega');
+                    e.target.reset();
+                    alert("Entrega confirmada no sistema. A Base Logística já foi notificada.");
+
+                } catch (err) {
+                    alert("Erro ao confirmar entrega: " + err.message);
+                } finally {
+                    btn.innerHTML = originalBtnText; btn.disabled = false;
+                }
+            };
+        }
 
         window.toggleGPS = function() { if(watchId) window.desligarGPS(); else window.ligarGPS(); };
 
-        // SOLUÇÃO DE SEGUNDO PLANO E WAZE LOCK
         async function ativarWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
@@ -2126,7 +2331,6 @@
             if (wakeLock !== null && document.visibilityState === 'visible') { ativarWakeLock(); }
         });
 
-        // MODO WAZE: RASTREIO DINÂMICO E SEGUNDO PLANO
         window.ligarGPS = async function() {
             if(!navigator.geolocation) return alert("O navegador do celular bloqueia leitura de GPS.");
             if(!veiculoDoRomaneio) return alert("Ação negada: Sem veículo atribuído.");
