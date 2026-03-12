@@ -296,8 +296,6 @@ window.popularSelectMotoristasRadar = function() {
 
 window.preencherRotaPlanejada = async function() {
     const email = document.getElementById('radar-motorista').value; if(!email) return;
-    document.getElementById('origem-rota').value = "São José do Rio Preto, SP";
-    document.getElementById('destino-rota').value = "Consultando destinos...";
     
     const snap = await db.ref(`${DB_ROOT}/cargas`).orderByChild('motorista_email').equalTo(email).once('value');
     let destinosProg = [];
@@ -355,13 +353,20 @@ window.analisarRotaClientesBase = async function() {
     const geocoder = new google.maps.Geocoder();
     const org = document.getElementById('origem-rota').value;
 
+    // CORREÇÃO CRÍTICA DO ERRO DE PARSE DE LAT/LNG (Evita o INVALID_REQUEST)
     if(org.includes(',')) {
-        try {
-            const parts = org.split(',');
-            originLatLng = new google.maps.LatLng(parseFloat(parts[0]), parseFloat(parts[1]));
-        } catch(e) {}
+        const parts = org.split(',');
+        const latParse = parseFloat(parts[0].trim());
+        const lngParse = parseFloat(parts[1].trim());
+        
+        // Só aceita se os dois lados da vírgula forem números de fato
+        if(!isNaN(latParse) && !isNaN(lngParse)) {
+            originLatLng = new google.maps.LatLng(latParse, lngParse);
+            originSourceMsg = "Coordenadas Iniciais";
+        }
     }
     
+    // Se a string for um texto "Cidade, Estado", originLatLng não vai ser setado acima, e cai aqui no geocode perfeitamente.
     if (!originLatLng) {
         btn.innerHTML = "<div class='loader border-t-amber-400 mx-auto'></div> Validando Origem por Texto...";
         originLatLng = await new Promise(res => {
@@ -376,7 +381,7 @@ window.analisarRotaClientesBase = async function() {
 
     if(!originLatLng) {
         btn.innerHTML = "<i class='bx bx-map-pin text-xl'></i> Traçar Rota & Iniciar Varredura";
-        return alert("Erro: Não foi possível localizar o ponto de origem da viagem no mapa.");
+        return alert("Erro: Não foi possível localizar o ponto de origem no Google Maps. Verifique se o endereço inicial está digitado corretamente.");
     }
 
     const cgSnap = await db.ref(`${DB_ROOT}/cargas`).orderByChild('motorista_email').equalTo(emailMotorista).once('value');
@@ -459,13 +464,17 @@ window.analisarRotaClientesBase = async function() {
 
     const cleanWaypoints = waypointsList.map(w => ({ location: w.location, stopover: true }));
 
+    // CONSTRUÇÃO ESTRUTURADA DA ROTA (Evita INVALID_REQUEST quando só tem 1 destino sem waypoints extras)
     const req = {
         origin: originLatLng,
         destination: finalDestination.location,
-        waypoints: cleanWaypoints,
-        optimizeWaypoints: true, 
         travelMode: 'DRIVING'
     };
+
+    if(cleanWaypoints.length > 0) {
+        req.waypoints = cleanWaypoints;
+        req.optimizeWaypoints = true;
+    }
 
     try {
         directionsService.route(req, (res, status) => {
@@ -509,17 +518,17 @@ window.processarCruzamentoRadial = function(res, btn, clientesBase, destinosExcl
             });
         });
 
-        // RAIO DE 50KM NO CORREDOR DA ROTA!
         const RAIO_LOGISTICO_METROS = 50000; 
 
+        // EVOLUÇÃO DE PERFORMANCE: Passo de 5km evita travamento do navegador em viagens estaduais
         const densePath = [];
         for (let i = 0; i < detailedPath.length - 1; i++) {
             const p1 = detailedPath[i];
             const p2 = detailedPath[i+1];
             densePath.push(p1);
             const dist = google.maps.geometry.spherical.computeDistanceBetween(p1, p2);
-            if (dist > 50) { 
-                const fractionSteps = Math.ceil(dist / 50);
+            if (dist > 5000) { 
+                const fractionSteps = Math.ceil(dist / 5000);
                 for (let j = 1; j < fractionSteps; j++) {
                     densePath.push(google.maps.geometry.spherical.interpolate(p1, p2, j / fractionSteps));
                 }
@@ -1214,6 +1223,7 @@ if(frmMan) {
     };
 }
 
+// ATRIBUIÇÃO V5: MOTORISTA PRIMEIRO, CAMINHÃO DEPOIS
 window.abrirModalCarga = function() {
     db.ref(`${DB_ROOT}/equipe`).once('value', snap => { 
         let h = '<option value="">1. Selecione o Motorista</option>'; 
@@ -1488,22 +1498,30 @@ window.processarEExibirMapaMotorista = async function(romaneio, placa) {
         
         if(!directionsService) directionsService = new google.maps.DirectionsService();
         
-        directionsService.route({
+        // ESTRUTURA BLINDADA PARA EVITAR INVALID_REQUEST NO MOTORISTA TAMBÉM
+        const routeReq = {
             origin: new google.maps.LatLng(originLatLng.lat, originLatLng.lng),
             destination: finalDestination.location,
-            waypoints: waypointsList,
-            optimizeWaypoints: true, 
             travelMode: 'DRIVING'
-        }, (res, status) => {
+        };
+
+        if (waypointsList.length > 0) {
+            routeReq.waypoints = waypointsList;
+            routeReq.optimizeWaypoints = true;
+        }
+
+        directionsService.route(routeReq, (res, status) => {
             if(overlay) overlay.classList.add('hidden');
             
             if(status === 'OK' && dirRendererMot) {
                 dirRendererMot.setDirections(res);
 
-                const order = res.routes[0].waypoint_order;
-                const rawWaypoints = validDeliveryPoints.filter((_, i) => i !== destIndex);
-                
-                const sortedPoints = order.map(index => rawWaypoints[index]);
+                let sortedPoints = [];
+                if(res.routes[0].waypoint_order && res.routes[0].waypoint_order.length > 0) {
+                    const order = res.routes[0].waypoint_order;
+                    const rawWaypoints = validDeliveryPoints.filter((_, i) => i !== destIndex);
+                    sortedPoints = order.map(index => rawWaypoints[index]);
+                }
                 sortedPoints.push(finalDestination);
 
                 let cartoesCarga = '';
@@ -1637,7 +1655,7 @@ if(frmVisita) {
             const cliNome = document.getElementById('vis-cliente-nome').value;
             const cliId = document.getElementById('vis-cliente-id').value;
 
-            // MONETIZAÇÃO ATUALIZADA
+            // MONETIZAÇÃO
             let taxaSistema = 0;
             if (acao === 'Venda Realizada' && tipoVenda === 'oportunidade' && valor > 0) {
                 taxaSistema = valor * (PERCENTUAL_SISTEMA / 100);
