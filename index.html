@@ -461,14 +461,14 @@
                     </div>
                 </div>
 
-                <!-- Seção Entregas -->
+                <!-- Seção Entregas Oficiais Reordenadas -->
                 <div id="motorista-lista-cargas" class="w-full"></div>
 
-                <!-- Seção Radar / Visitas -->
+                <!-- Seção Radar / Visitas Despachadas Pelo Admin -->
                 <div id="motorista-lista-visitas" class="w-full mt-6 sm:mt-8"></div>
 
                 <button onclick="window.abrirModalOcorrencia()" class="w-full bg-slate-800 border border-slate-700 text-white font-black py-5 sm:py-6 rounded-3xl shadow-2xl flex justify-center items-center gap-3 sm:gap-4 active:scale-95 transition-all mt-4 sm:mt-6">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center text-2xl sm:text-3xl"><i class='bx bx-receipt'></i></div>
+                    <div class="w-10 h-10 sm:w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center text-2xl sm:text-3xl"><i class='bx bx-receipt'></i></div>
                     <div class="text-left">
                         <span class="block text-[10px] sm:text-xs uppercase tracking-widest font-black">Reportar Ocorrência</span>
                         <span class="block text-[7px] sm:text-[8px] text-slate-400 font-normal uppercase mt-0.5 tracking-wider">Combustível, Pedágio ou Avaria</span>
@@ -479,19 +479,20 @@
     </div>
 
     <!-- ================= 5. MODAIS INTEGRATIVOS ================= -->
-    <!-- Modal Atribuir Veículo -->
+    
+    <!-- Modal Atribuir Veículo (LIBERAR ROTA) -->
     <div id="modal-atribuir-veiculo" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border-t-8 border-t-green-500 max-h-[95vh] overflow-y-auto">
             <div class="p-4 sm:p-6 border-b bg-slate-50 flex justify-between items-center">
-                <h3 class="font-black text-slate-800 uppercase text-xs sm:text-sm tracking-tight flex items-center gap-2"><i class='bx bx-play-circle text-green-500 text-lg sm:text-xl'></i> Despachar e Atribuir Caminhão</h3>
+                <h3 class="font-black text-slate-800 uppercase text-xs sm:text-sm tracking-tight flex items-center gap-2"><i class='bx bx-play-circle text-green-500 text-lg sm:text-xl'></i> Liberar Rota ao Motorista</h3>
                 <button onclick="window.fecharModal('modal-atribuir-veiculo')" class="text-slate-400 hover:text-red-500 transition"><i class='bx bx-x text-2xl sm:text-3xl'></i></button>
             </div>
             <form id="form-atribuir-veiculo" class="p-5 sm:p-8 space-y-4 sm:space-y-5">
                 <input type="hidden" id="atr-motorista-email">
                 <p id="atr-motorista-nome-display" class="text-center font-black text-slate-800 uppercase text-sm mb-4"></p>
-                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Para concluir a rota planejada, selecione o caminhão:</label>
+                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Selecione o Caminhão para o Trajeto</label>
                 <select id="atr-veiculo" required class="w-full p-3 sm:p-4 border-2 border-slate-100 rounded-2xl bg-white text-xs sm:text-sm font-black outline-none transition focus:border-green-500"></select>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all flex justify-center gap-2 items-center"><i class='bx bx-rocket text-xl'></i> Confirmar Missão Oficial</button>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white p-4 sm:p-5 rounded-2xl font-black uppercase text-[10px] sm:text-xs shadow-xl active:scale-95 transition-all flex justify-center gap-2 items-center"><i class='bx bx-rocket text-xl'></i> Confirmar e Despachar</button>
             </form>
         </div>
     </div>
@@ -503,12 +504,10 @@
             <form id="form-edit-cliente" class="space-y-3 sm:space-y-4">
                 <input type="hidden" id="edit-cli-id">
                 <input type="text" id="edit-cli-nome" placeholder="Nome Comercial" required class="w-full p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
-                
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input type="text" id="edit-cli-tel" placeholder="WhatsApp" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
                     <input type="text" id="edit-cli-cidade" placeholder="Cidade (UF)" required class="w-full sm:w-1/2 p-3 sm:p-4 border rounded-xl sm:rounded-2xl text-xs sm:text-sm">
                 </div>
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100 pt-3">
                     <input type="text" id="edit-cli-comprador" placeholder="Comprador" class="w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none">
                     <input type="text" id="edit-cli-dono" placeholder="Dono" class="w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none">
@@ -517,7 +516,6 @@
                     <input type="text" id="edit-cli-telefone-contato" placeholder="Telefone Contato Extra" class="w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none sm:col-span-2">
                     <textarea id="edit-cli-obs" placeholder="Observações Gerais..." class="w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none sm:col-span-2 resize-none" rows="2"></textarea>
                 </div>
-
                 <div class="bg-blue-50 border border-blue-200 p-2 sm:p-3 rounded-xl mb-1 mt-1 sm:mt-2">
                     <p class="text-[8px] sm:text-[9px] font-black text-blue-800 uppercase tracking-widest flex items-center gap-1"><i class='bx bx-check-shield'></i> Correção de GPS (Google API)</p>
                     <p class="text-[9px] sm:text-[10px] text-blue-600 mt-1 leading-tight">Se precisar corrigir a localização, digite abaixo e **CLIQUE NA SUGESTÃO**. Se não clicar, manteremos a localização antiga salvando apenas o texto.</p>
@@ -666,7 +664,7 @@
         </div>
     </div>
 
-    <!-- Modal Cliente -->
+    <!-- Modal Cliente (Cadastro Novo) -->
     <div id="modal-cliente" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
         <div class="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
             <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-store text-red-600'></i> Nova Loja na Base</h3>
@@ -699,7 +697,7 @@
         </div>
     </div>
     
-    <!-- Modal Equipe -->
+    <!-- Modal Equipe (Cadastro Novo) -->
     <div id="modal-equipe" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[200] p-4">
         <div class="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[95vh] overflow-y-auto">
             <h3 class="font-black uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2"><i class='bx bxs-user-plus text-slate-900'></i> Admitir Colaborador</h3>
